@@ -27,6 +27,21 @@ class MMConfig:
         self.T = 1.0  # Time horizon (1 day normalized)
         self.k = 1.5  # Market impact parameter
         
+        # ------------------------------------------------------------------
+        # Order-Flow Imbalance (OFI) signal configuration  🔄
+        # ------------------------------------------------------------------
+        # Price-centre shift coefficient (in *ticks* per unit OFI)
+        self.beta_ofi = 0.3
+
+        # Look-back window used to compute the OFI (seconds)
+        self.ofi_window_seconds = 1
+
+        # Clamp the normalised OFI to ±N standard deviations (robust to outliers)
+        self.ofi_clamp_std = 3.0
+
+        # Default tick-size (used as fall-back if symbol specific lookup fails)
+        self.default_tick_size = 0.01
+
         # Inventory Control
         self.inventory_target = 0.0  # Target inventory
         self.max_inventory = 1.0  # Maximum inventory (À définir: N_max)
@@ -96,6 +111,7 @@ class MMConfig:
         print(f"Inventory Threshold (N★): {self.inventory_threshold}")
         print(f"Spread range: {self.min_spread_bps}-{self.max_spread_bps} bps")
         print(f"Base quote size: {self.base_quote_size}")
+        print(f"OFI β: {self.beta_ofi}  |  Window: {self.ofi_window_seconds}s  |  Clamp: ±{self.ofi_clamp_std}σ")
         print("=" * 40)
 
 # Instance globale de configuration

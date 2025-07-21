@@ -15,6 +15,7 @@ import math
 from datetime import datetime, timedelta
 import logging
 from .config import mm_config
+from .ofi import OFICalculator   # Helper for users – quoter only consumes OFI value
 
 class AvellanedaStoikovQuoter:
     """
@@ -130,8 +131,11 @@ class AvellanedaStoikovQuoter:
         
         return optimal_spread
     
-    def compute_quotes(self, mid_price: float, inventory: float, 
-                      time_remaining: float = None) -> Dict[str, float]:
+    def compute_quotes(self,
+                       mid_price: float,
+                       inventory: float,
+                       time_remaining: float = None,
+                       ofi: float = 0.0) -> Dict[str, float]:
         """
         Calcule les prix bid et ask optimaux
         
@@ -160,14 +164,29 @@ class AvellanedaStoikovQuoter:
         
         # Calculer bid et ask
         half_spread = optimal_spread / 2
-        bid_price = reservation_price - half_spread
-        ask_price = reservation_price + half_spread
+        # ------------------------------------------------------------------
+        # 3️⃣  Centre shift based on OFI  (§3.3bis of the spec)
+        # ------------------------------------------------------------------
+        tick_size = mm_config.get_symbol_config(self.symbol).get(
+            "tick_size", mm_config.default_tick_size
+        )
+        max_shift = tick_size  # ±1 tick
+        center_shift = np.clip(mm_config.beta_ofi * ofi * tick_size, -max_shift, max_shift)
+
+        reservation_price_shifted = reservation_price + center_shift
+
+        # Final bid / ask
+        bid_price = reservation_price_shifted - half_spread
+        ask_price = reservation_price_shifted + half_spread
         
         quotes = {
             'bid_price': bid_price,
             'ask_price': ask_price,
             'reservation_price': reservation_price,
+            'reservation_price_shifted': reservation_price_shifted,
             'optimal_spread': optimal_spread,
+            'ofi': ofi,
+            'center_shift': center_shift,
             'spread_bps': (optimal_spread / mid_price) * 10000,
             'mid_price': mid_price,
             'inventory': inventory,
