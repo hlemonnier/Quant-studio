@@ -79,6 +79,12 @@ class SignalGenerator:
         with open(full_model_path, 'rb') as f:
             self.model = joblib.load(f)
 
+            # PATCH pour XGBClassifier (récupère le bon estimateur, corrige l’attribut manquant)
+            if hasattr(self.model, "named_estimators_") and 'xgb' in self.model.named_estimators_:
+                xgb = self.model.named_estimators_['xgb']
+                if not hasattr(xgb, "use_label_encoder"):
+                    xgb.use_label_encoder = False
+
 
         # ML Features
         self.price_close_d = price_close_d

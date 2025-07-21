@@ -93,3 +93,13 @@ CREATE TABLE {{schema}}.trades_{{instrument}} (
         size DECIMAL(18, 8) NOT NULL,
         taker_side VARCHAR(6) /*should be either 'buy' or 'sell' */
 );
+
+DROP TABLE IF EXISTS {{schema}}.extp_ladder_{{instrument}} CASCADE; 
+CREATE TABLE {{schema}}.extp_ladder_{{instrument}} (
+    time TIMESTAMP WITHOUT TIME ZONE NOT NULL PRIMARY KEY,
+    bid NUMERIC(18,8) NOT NULL,
+    ask NUMERIC(18,8) NOT NULL,
+    qty NUMERIC(18,8) NOT NULL,
+    bid_provider VARCHAR(255) NOT NULL,
+    ask_provider VARCHAR(255) NOT NULL
+);

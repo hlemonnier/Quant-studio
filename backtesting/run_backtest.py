@@ -7,9 +7,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import warnings
 warnings.filterwarnings("ignore", category=Warning)
 warnings.filterwarnings('ignore', message='pandas only supports SQLAlchemy connectable')
-import datetime
 import psycopg2
-import pandas as pd
 import sys
 import os
 import backtrader as bt
@@ -21,26 +19,31 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, project_root)
 
 # Import configuration and strategies
-from data.database.config_database import load_config
+#from data.database.config_database import load_config
 from parameters.config_file import Config
-from backtesting.backtrader_observers import OrderObserver, DrawdownLength
-from strategies.strategy_crossover_long_short import CrossOver_LongShort
+from backtesting.backtrader_observers import OrderObserver
+from strategies.strategies_model.strategy_crossover_long_short import CrossOver_LongShort
 from strategies.strategy_buy_and_hold import BuyAndHold
-from strategies.strategy_long_short import LongShort
+from strategies.strategies_model.strategy_long_short import LongShort
 from strategies.strategy_long_short_grid import LongShortGrid
-from strategies.strategy_grid_trading import Grid
+from strategies.strategies_model.strategy_grid_trading import Grid
 from backtesting.backtesting_reports_generator import ExcelReport
 
-def get_database_connection():
-    """
-    Establishes a connection to the PostgreSQL database using configuration details.
-
-    Returns:
-        conn (psycopg2.extensions.connection): The database connection object.
-    """
-    config = load_config()
-    conn = psycopg2.connect(**config)
-    return conn
+# def get_database_connection():
+#     """
+#     Établit une connexion à la base de données PostgreSQL en utilisant les détails de configuration.
+#
+#     Retourne:
+#         conn (psycopg2.extensions.connection): L'objet de connexion à la base de données.
+#     """
+#     # Charger la configuration de connexion à la base de données (hôte, port, user, password, dbname, etc.)
+#     config = load_config()
+#
+#     # Établir une connexion à PostgreSQL avec les paramètres récupérés
+#     conn = psycopg2.connect(**config)
+#
+#     # Retourner l'objet de connexion pour interagir avec la base de données
+#     return conn
 
 
 def fetch_table_data(conn, table_name):
@@ -107,76 +110,81 @@ def fill_gaps_with_forward_filling(df, expected_freq):
     return df_forward_filled
 
 
+import pandas as pd
+import datetime
+import backtrader as bt
+
+
 def get_data(data_used, from_date, to_date, time_frame):
     """
-    Fetches and processes data from a PostgreSQL database for use in a Backtrader backtest.
-    
+    Fetches and processes data for Backtrader backtest.
+
     Parameters:
-        from_date (str): The start date for the data in 'YYYY-MM-DD' or 'YYYY-MM-DDTHH:MM:SS' format.
-        to_date (str): The end date for the data in 'YYYY-MM-DD' or 'YYYY-MM-DDTHH:MM:SS' format.
-        time_frame (str): The time frame identifier to determine the appropriate table name.
+        data_used (str): 'Market Data' or 'Simulated Data'
+        from_date (str): The start date ('YYYY-MM-DD' or 'YYYY-MM-DDTHH:MM:SS')
+        to_date (str): The end date (same format as from_date)
+        time_frame (str): Time frame identifier (e.g. '5min', '1h', etc.)
 
     Returns:
-        bt.feeds.PandasData: The Backtrader data feed ready to be added to a cerebro instance.
+        bt.feeds.PandasData: Backtrader data feed
     """
-    if data_used == 'Market Data':
-        # Get table name based on the given time frame
-        table_name = get_table_name(time_frame)
 
-        # Connect to the database and fetch table data
-        conn = get_database_connection()
-        df = fetch_table_data(conn, table_name)
-        df = fill_gaps_with_forward_filling(df, time_frame)
+    # Helper to parse dates
+    def parse_date(date_str):
+        if date_str is None:
+            return None
+        date_format = '%Y-%m-%d'
+        time_format = 'T%H:%M:%S'
+        strp_format = date_format + (time_format if 'T' in date_str else '')
+        return datetime.datetime.strptime(date_str, strp_format)
 
-    elif data_used == 'Simulated Data':
-        # Get table name based on the given time frame
-        table_name = f"hybrid_model_ohlcv_btc_usd_{time_frame}"
-
-        df = pd.read_csv(f"C:/Users/SolalDanan/enigma-labs-quant-strategy/data/data_simulation/Hybrid_Model/hybrid_model_csv/{table_name}.csv")
-        df = fill_gaps_with_forward_filling(df, time_frame)
-
-    # Convert from_date string to datetime object
-    date_format = '%Y-%m-%d'
-    time_format = 'T%H:%M:%S'
-    strp_format = date_format + (time_format if 'T' in from_date else '')
-    from_date = datetime.datetime.strptime(from_date, strp_format)
-
-    # Convert to_date string to datetime object if provided
-    if to_date is not None:
-        strp_format = date_format + (time_format if 'T' in to_date else '')
-        to_date = datetime.datetime.strptime(to_date, strp_format)
+    from_date_dt = parse_date(from_date)
+    to_date_dt = parse_date(to_date)
 
     if data_used == 'Market Data':
-        data = bt.feeds.PandasData(
-            dataname=df,
-            fromdate=from_date,         
-            todate=to_date,
-            tz='UTC',
-            datetime=0,
-            high=6,
-            low=7,
-            open=5,
-            close=8,
-            volume=9
-        )    
-        
+        # # Get table name based on the given time frame
+        # table_name = get_table_name(time_frame)
+        #
+        # # Connect to the database and fetch table data
+        # conn = get_database_connection()
+        # df = fetch_table_data(conn, table_name)
+        # df = fill_gaps_with_forward_filling(df, time_frame)
+        #
+        # data = bt.feeds.PandasData(
+        #     dataname=df,
+        #     fromdate=from_date_dt,
+        #     todate=to_date_dt,
+        #     tz='UTC',
+        #     datetime=0,
+        #     open=5,
+        #     high=6,
+        #     low=7,
+        #     close=8,
+        #     volume=9
+        # )
+        # <-- Ajoute ici ton code de récupération pour les données marché si besoin
+        raise NotImplementedError("La récupération des données marché n'est pas implémentée dans ce template.")
+
     elif data_used == 'Simulated Data':
+        csv_path = f"/home/hlemonnier/Bureau/Coding/enigma-quant/data/simulators/hybrid_model_ohlcv_btc_usd_15m.csv"
+        df = pd.read_csv(csv_path)
+        df = fill_gaps_with_forward_filling(df, time_frame)
         data = bt.feeds.PandasData(
             dataname=df,
-            fromdate=from_date,         
-            todate=to_date,
+            fromdate=from_date_dt,
+            todate=to_date_dt,
             tz='UTC',
             datetime=0,
+            open=1,
             high=2,
             low=3,
-            open=1,
             close=4,
             volume=5
         )
-    
+    else:
+        raise ValueError("Invalid value for data_used. Must be 'Market Data' or 'Simulated Data'.")
+
     return data
-
-
 
 
 def print_strategy_result(thestrat, returns, args):
@@ -470,14 +478,14 @@ def runstrat(args):
 
     # Generate tearsheet if enabled
     if args.print_tearsheet:
-        html_path = f"C:/Users/SolalDanan/enigma-labs-quant-strategy/backtesting_result/tearsheet_{args.strategy_used}_btc_usd_spot.html"
+        html_path = f"/home/hlemonnier/Bureau/Coding/enigma-quant/backtesting/tearsheet_{args.strategy_used}_btc_usd_spot.html"
         quantstats.reports.html(returns, periods_per_year=args.periods, benchmark=args.benchmark, rf=args.riskfree_rate,
                                 output=html_path, title=f"{args.strategy_used} Tearsheet")
     
     
     # Write results to an Excel file if enabled
     if args.write:
-        excel_path = f"C:/Users/SolalDanan/enigma-labs-quant-strategy/backtesting_result/results_{args.strategy_used}_btc_usd_spot.xlsx"
+        excel_path = f"/home/hlemonnier/Bureau/Coding/enigma-quant/backtesting/results_{args.strategy_used}_btc_usd_spot.xlsx"
         report = ExcelReport(args=args, thestrat=thestrat, analysis=trade_analysis, returns=returns, 
                             positions=positions, transactions=transactions, excel_path=excel_path)
         report.get_excel_report()
