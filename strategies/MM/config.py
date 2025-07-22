@@ -25,7 +25,9 @@ class MMConfig:
         
         # Avellaneda-Stoikov Parameters
         self.gamma = 0.1  # Risk aversion - À définir avec le boss
-        self.sigma = 0.02  # Volatility estimate (initial)
+        # Volatility estimate (initial). 5 % is more realistic for intra-day crypto
+        # and avoids systematic “volatility spike” pauses.
+        self.sigma = 0.05
         self.T = 1.0  # Time horizon (1 day normalized)
         self.k = 1.5  # Market impact parameter
         
@@ -47,6 +49,11 @@ class MMConfig:
         self.stop_loss_pct = 50.0
         # Limite de perte quotidienne spécifique au market making
         self.daily_loss_limit_pct = 20.0  # Arrêt de la journée si pertes > 20 %
+
+        # Volatility guardrail
+        # Trading pauses if realised volatility > max_volatility_threshold
+        # Crypto can easily reach 10 % intraday, so we allow up to 15 %.
+        self.max_volatility_threshold = 0.15  # 15 %
         
         # ------------------------------------------------------------------
         # Order-Flow Imbalance (OFI) parameters  (§3.3bis)
@@ -115,6 +122,7 @@ class MMConfig:
         print(f"Base quote size: {self.base_quote_size}")
         print(f"Default symbol: {self.default_symbol}")
         print(f"Daily loss limit: {self.daily_loss_limit_pct}%")
+        print(f"Max volatility allowed: {self.max_volatility_threshold:.2%}")
         print(f"OFI β: {self.beta_ofi} | Window: {self.ofi_window_seconds}s | Clamp: ±{self.ofi_clamp_std}σ")
         print("=" * 40)
 

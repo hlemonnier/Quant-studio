@@ -223,8 +223,12 @@ class TradingEngine:
             return True, reason
         
         # 2. Volatility spike check
-        if self.current_volatility > mm_config.sigma * 2.0:
-            return True, f"Volatility spike: {self.current_volatility:.4f} > {mm_config.sigma * 2.0:.4f}"
+        # Use configurable threshold from config instead of fixed 2×σ
+        if self.current_volatility > mm_config.max_volatility_threshold:
+            return True, (
+                f"Volatility spike: {self.current_volatility:.4f} "
+                f"> {mm_config.max_volatility_threshold:.4f}"
+            )
         
         # 3. Latency check (simulated)
         avg_latency = self.kpi_tracker.get_average_latency('quote_ack')
