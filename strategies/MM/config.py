@@ -48,6 +48,18 @@ class MMConfig:
         # Limite de perte quotidienne spécifique au market making
         self.daily_loss_limit_pct = 20.0  # Arrêt de la journée si pertes > 20 %
         
+        # ------------------------------------------------------------------
+        # Order-Flow Imbalance (OFI) parameters  (§3.3bis)
+        # ------------------------------------------------------------------
+        # Coefficient β : nb de ticks de déplacement du centre par unité d’OFI
+        self.beta_ofi = 0.30
+        # Fenêtre (s) pour le calcul de l’OFI
+        self.ofi_window_seconds = 1.0
+        # Clamp du z-score de l’OFI pour éviter les outliers
+        self.ofi_clamp_std = 3.0
+        # Tick-size par défaut (fallback si lookup symbole indisponible)
+        self.default_tick_size = 0.01
+
         # Data Storage
         self.data_dir = 'data/mm_data'
         self.parquet_compression = 'snappy'
@@ -103,6 +115,7 @@ class MMConfig:
         print(f"Base quote size: {self.base_quote_size}")
         print(f"Default symbol: {self.default_symbol}")
         print(f"Daily loss limit: {self.daily_loss_limit_pct}%")
+        print(f"OFI β: {self.beta_ofi} | Window: {self.ofi_window_seconds}s | Clamp: ±{self.ofi_clamp_std}σ")
         print("=" * 40)
 
 # Instance globale de configuration
