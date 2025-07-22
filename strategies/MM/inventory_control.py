@@ -36,6 +36,10 @@ class InventoryController:
         self.daily_pnl = 0.0
         self.total_pnl = 0.0
         
+        # Capital de base pour les calculs de pourcentage (pour MM)
+        # Estimation du capital alloué à cette stratégie
+        self.base_capital = 10000.0  # $10,000 par défaut
+        
     def update_inventory(self, trade_quantity: float, trade_price: float):
         """Met à jour l'inventaire après un trade"""
         # Mettre à jour l'inventaire
@@ -44,6 +48,7 @@ class InventoryController:
         # Calculer le PnL (simplifié)
         pnl_change = -trade_quantity * trade_price  # Coût du trade
         self.total_pnl += pnl_change
+        self.daily_pnl += pnl_change
         
         # Enregistrer dans l'historique
         self.inventory_history.append({
@@ -166,18 +171,35 @@ class InventoryController:
         """
         Détermine si le trading doit être suspendu
         
+        Pour le market making, nous utilisons des limites de perte adaptées:
+        - Limite quotidienne (daily_loss_limit_pct): % du capital alloué
+        - Plus souple que le stop-loss global pour permettre la respiration du MM
+        
         Returns:
             (should_pause, reason)
         """
         # Vérifier l'inventaire maximum
-        if abs(self.current_inventory) >= self.max_inventory:
+        if abs(self.current_inventory) > self.max_inventory:
             return True, f"Inventaire limite atteinte: {self.current_inventory:.4f}"
         
-        # Vérifier le PnL (stop loss)
+        # Vérifier le PnL quotidien (limite de perte spécifique au MM)
+        # Utiliser daily_loss_limit_pct au lieu de stop_loss_pct
+        if hasattr(mm_config, 'daily_loss_limit_pct'):
+            # Calculer la perte maximale autorisée en valeur absolue
+            # basée sur un pourcentage du capital alloué
+            max_daily_loss_dollars = (mm_config.daily_loss_limit_pct / 100.0) * self.base_capital
+            
+            # Comparer avec la perte quotidienne (en valeur absolue)
+            if self.daily_pnl < -max_daily_loss_dollars:
+                pnl_pct = (self.daily_pnl / self.base_capital) * 100
+                return True, f"Stop loss déclenché: PnL={self.daily_pnl:.2f} ({pnl_pct:.1f}% du capital)"
+        
+        # Vérifier aussi le stop-loss global (protection ultime)
         if hasattr(mm_config, 'stop_loss_pct'):
-            max_loss = mm_config.stop_loss_pct / 100.0
-            if self.total_pnl < -max_loss:
-                return True, f"Stop loss déclenché: PnL={self.total_pnl:.4f}"
+            max_total_loss_dollars = (mm_config.stop_loss_pct / 100.0) * self.base_capital
+            if self.total_pnl < -max_total_loss_dollars:
+                pnl_pct = (self.total_pnl / self.base_capital) * 100
+                return True, f"Stop loss global déclenché: PnL total={self.total_pnl:.2f} ({pnl_pct:.1f}%)"
         
         return False, ""
     
@@ -202,6 +224,7 @@ class InventoryController:
             'max_inventory': self.max_inventory,
             'current_skew': self.calculate_inventory_skew(),
             'total_pnl': self.total_pnl,
+            'daily_pnl': self.daily_pnl,
             'inventory_mean_100': inventory_mean,
             'inventory_std_100': inventory_std,
             'inventory_range': (inventory_min, inventory_max),
@@ -225,6 +248,7 @@ class InventoryController:
         print(f"Utilisation: {stats['inventory_utilization']:.1%}")
         print(f"Skew actuel: {skew:+.3f}")
         print(f"PnL total: ${stats['total_pnl']:+.2f}")
+        print(f"PnL quotidien: ${stats['daily_pnl']:+.2f}")
         print(f"Nombre de trades: {stats['trades_count']}")
         
         # Indicateur visuel du skew
