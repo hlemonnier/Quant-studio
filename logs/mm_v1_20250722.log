@@ -1,0 +1,332 @@
+2025-07-22 13:00:15,356 - TradingEngine-BTCUSDT - INFO - 🚀 Starting trading loop for BTCUSDT
+2025-07-22 13:00:15,600 - LocalBook-BTCUSDT - INFO - ✅ Snapshot récupéré: 1000 bids, 1000 asks, updateId=73267667791
+2025-07-22 13:00:15,600 - TradingEngine-BTCUSDT - INFO - ✅ Initialized: Mid=$118940.01
+2025-07-22 13:00:15,600 - TradingEngine-BTCUSDT - INFO - 🔄 Starting main trading loop
+2025-07-22 13:00:15,600 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:00:15,600 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:00:15,701 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:00:15,701 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:00:15,801 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:00:15,801 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:00:15,902 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:00:15,902 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:00:16,002 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:00:16,002 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:00:16,103 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:00:16,103 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:00:16,203 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:00:16,203 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:00:16,303 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:00:16,303 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:00:16,404 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:00:16,404 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:00:16,504 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:00:16,504 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:00:16,605 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:00:16,605 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:00:16,705 - TradingEngine-BTCUSDT - WARNING - ⏸️  Pausing trading: Volatility spike: 0.0455 > 0.0400
+2025-07-22 13:00:31,492 - TradingEngine-BTCUSDT - INFO - Trading loop cancelled
+2025-07-22 13:00:31,492 - TradingEngine-BTCUSDT - INFO - Trading loop stopped
+2025-07-22 13:06:55,511 - TradingEngine-BTCUSDT - INFO - 🚀 Starting trading loop for BTCUSDT
+2025-07-22 13:06:55,770 - LocalBook-BTCUSDT - INFO - ✅ Snapshot récupéré: 1000 bids, 1000 asks, updateId=73267932987
+2025-07-22 13:06:55,770 - TradingEngine-BTCUSDT - INFO - ✅ Initialized: Mid=$119089.99
+2025-07-22 13:06:55,770 - TradingEngine-BTCUSDT - INFO - 🔄 Starting main trading loop
+2025-07-22 13:06:55,770 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:06:55,770 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:06:55,871 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:06:55,871 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:06:55,971 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:06:55,972 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:06:56,072 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:06:56,072 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:06:56,172 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:06:56,173 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:06:56,273 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:06:56,273 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:06:56,373 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:06:56,373 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:06:56,474 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:06:56,474 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:06:56,574 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:06:56,574 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:06:56,675 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:06:56,675 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:06:56,775 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:06:56,775 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:06:56,876 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:06:56,876 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:06:56,976 - TradingEngine-BTCUSDT - WARNING - ⏸️  Pausing trading: Volatility spike: 0.0440 > 0.0400
+2025-07-22 13:12:42,691 - TradingEngine-BTCUSDT - INFO - 🚀 Starting trading loop for BTCUSDT
+2025-07-22 13:12:42,951 - LocalBook-BTCUSDT - INFO - ✅ Snapshot récupéré: 1000 bids, 1000 asks, updateId=73268200440
+2025-07-22 13:12:42,951 - TradingEngine-BTCUSDT - INFO - ✅ Initialized: Mid=$118840.01
+2025-07-22 13:12:42,951 - TradingEngine-BTCUSDT - INFO - 🔄 Starting main trading loop
+2025-07-22 13:12:42,951 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:12:42,951 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:12:43,052 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:12:43,052 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:12:43,152 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:12:43,152 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:12:43,252 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:12:43,253 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:12:43,353 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:12:43,353 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:12:43,453 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:12:43,454 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:12:43,554 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:12:43,554 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:12:43,655 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:12:43,655 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:12:43,755 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:12:43,755 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:12:43,856 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:12:43,856 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:12:43,957 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:12:43,957 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:12:44,057 - AS-BTCUSDT - WARNING - ⚠️  Spread hors limites: 0.0bps
+2025-07-22 13:12:44,057 - TradingEngine-BTCUSDT - WARNING - ⚠️  Invalid quotes generated
+2025-07-22 13:12:44,158 - TradingEngine-BTCUSDT - WARNING - ⏸️  Pausing trading: Volatility spike: 0.0452 > 0.0400
+2025-07-22 13:16:32,902 - TradingEngine-BTCUSDT - INFO - 🚀 Starting trading loop for BTCUSDT
+2025-07-22 13:16:33,600 - LocalBook-BTCUSDT - INFO - ✅ Snapshot récupéré: 1000 bids, 1000 asks, updateId=73268339535
+2025-07-22 13:16:33,601 - TradingEngine-BTCUSDT - INFO - ✅ Initialized: Mid=$118976.76
+2025-07-22 13:16:33,601 - TradingEngine-BTCUSDT - INFO - 🔄 Starting main trading loop
+2025-07-22 13:16:35,107 - TradingEngine-BTCUSDT - INFO - 🟢 FILL: BID 0.0019 @ $118976.29 | Inventory: +0.0019
+2025-07-22 13:16:35,207 - TradingEngine-BTCUSDT - WARNING - ⏸️  Pausing trading: Stop loss déclenché: PnL=-222.7968
+2025-07-22 15:34:13,975 - TradingEngine-BTCUSDT - INFO - Trading loop cancelled
+2025-07-22 15:34:13,975 - TradingEngine-BTCUSDT - INFO - Trading loop stopped
+2025-07-22 15:34:17,811 - TradingEngine-BTCUSDT - INFO - 🚀 Starting trading loop for BTCUSDT
+2025-07-22 15:34:18,076 - LocalBook-BTCUSDT - INFO - ✅ Snapshot récupéré: 1000 bids, 1000 asks, updateId=73273838675
+2025-07-22 15:34:18,076 - TradingEngine-BTCUSDT - INFO - ✅ Initialized: Mid=$119006.76
+2025-07-22 15:34:18,076 - TradingEngine-BTCUSDT - INFO - 🔄 Starting main trading loop
+2025-07-22 15:34:19,383 - TradingEngine-BTCUSDT - WARNING - ⏸️  Pausing trading: Volatility spike: 0.0419 > 0.0400
+2025-07-22 15:41:36,909 - TradingEngine-BTCUSDT - INFO - Trading loop cancelled
+2025-07-22 15:41:36,909 - TradingEngine-BTCUSDT - INFO - Trading loop stopped
+2025-07-22 15:41:39,508 - asyncio - DEBUG - Using selector: EpollSelector
+2025-07-22 15:41:39,509 - TradingEngine-BTCUSDT - INFO - 🚀 Starting trading loop for BTCUSDT
+2025-07-22 15:41:39,511 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): api.binance.com:443
+2025-07-22 15:41:39,778 - urllib3.connectionpool - DEBUG - https://api.binance.com:443 "GET /api/v3/depth?symbol=BTCUSDT&limit=1000 HTTP/1.1" 200 10386
+2025-07-22 15:41:39,780 - LocalBook-BTCUSDT - INFO - ✅ Snapshot récupéré: 1000 bids, 1000 asks, updateId=73274520436
+2025-07-22 15:41:39,780 - TradingEngine-BTCUSDT - INFO - ✅ Initialized: Mid=$119385.83
+2025-07-22 15:41:39,780 - TradingEngine-BTCUSDT - INFO - 🔄 Starting main trading loop
+2025-07-22 15:41:39,780 - TradingEngine-BTCUSDT - DEBUG - 📊 Quotes updated: Bid $119389.66@0.0100 | Ask $119389.66@0.0100 | OFI: 0.000 | Shift: 0.000000
+2025-07-22 15:41:39,881 - TradingEngine-BTCUSDT - DEBUG - ❌ Cancelled 2 quotes
+2025-07-22 15:41:39,881 - TradingEngine-BTCUSDT - DEBUG - 📊 Quotes updated: Bid $119398.06@0.0100 | Ask $119398.06@0.0100 | OFI: 0.000 | Shift: 0.000000
+2025-07-22 15:41:39,982 - TradingEngine-BTCUSDT - DEBUG - ❌ Cancelled 2 quotes
+2025-07-22 15:41:39,982 - TradingEngine-BTCUSDT - DEBUG - 📊 Quotes updated: Bid $119408.01@0.0100 | Ask $119408.01@0.0100 | OFI: 0.000 | Shift: 0.000000
+2025-07-22 15:41:40,082 - TradingEngine-BTCUSDT - DEBUG - ❌ Cancelled 2 quotes
+2025-07-22 15:41:40,082 - TradingEngine-BTCUSDT - DEBUG - 📊 Quotes updated: Bid $119401.01@0.0100 | Ask $119401.01@0.0100 | OFI: 0.000 | Shift: 0.000000
+2025-07-22 15:41:40,183 - TradingEngine-BTCUSDT - DEBUG - ❌ Cancelled 2 quotes
+2025-07-22 15:41:40,183 - TradingEngine-BTCUSDT - DEBUG - 📊 Quotes updated: Bid $119385.92@0.0100 | Ask $119385.92@0.0100 | OFI: 0.000 | Shift: 0.000000
+2025-07-22 15:41:40,283 - TradingEngine-BTCUSDT - DEBUG - ❌ Cancelled 2 quotes
+2025-07-22 15:41:40,284 - TradingEngine-BTCUSDT - DEBUG - 📊 Quotes updated: Bid $119412.12@0.0100 | Ask $119412.12@0.0100 | OFI: 0.000 | Shift: 0.000000
+2025-07-22 15:41:40,384 - TradingEngine-BTCUSDT - DEBUG - ❌ Cancelled 2 quotes
+2025-07-22 15:41:40,384 - TradingEngine-BTCUSDT - DEBUG - 📊 Quotes updated: Bid $119413.80@0.0100 | Ask $119413.80@0.0100 | OFI: 0.000 | Shift: 0.000000
+2025-07-22 15:41:40,484 - TradingEngine-BTCUSDT - DEBUG - ❌ Cancelled 2 quotes
+2025-07-22 15:41:40,485 - TradingEngine-BTCUSDT - DEBUG - 📊 Quotes updated: Bid $119411.86@0.0100 | Ask $119411.86@0.0100 | OFI: 0.000 | Shift: 0.000000
+2025-07-22 15:41:40,585 - TradingEngine-BTCUSDT - DEBUG - ❌ Cancelled 2 quotes
+2025-07-22 15:41:40,585 - TradingEngine-BTCUSDT - DEBUG - 📊 Quotes updated: Bid $119427.12@0.0100 | Ask $119427.12@0.0100 | OFI: 0.000 | Shift: 0.000000
+2025-07-22 15:41:40,686 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0271
+2025-07-22 15:41:40,686 - TradingEngine-BTCUSDT - DEBUG - ❌ Cancelled 2 quotes
+2025-07-22 15:41:40,686 - TradingEngine-BTCUSDT - DEBUG - 📊 Quotes updated: Bid $119425.46@0.0100 | Ask $119425.46@0.0100 | OFI: 0.000 | Shift: 0.000000
+2025-07-22 15:41:40,786 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0354
+2025-07-22 15:41:40,786 - TradingEngine-BTCUSDT - DEBUG - ❌ Cancelled 2 quotes
+2025-07-22 15:41:40,787 - TradingEngine-BTCUSDT - DEBUG - 📊 Quotes updated: Bid $119400.03@0.0100 | Ask $119400.03@0.0100 | OFI: 0.000 | Shift: 0.000000
+2025-07-22 15:41:40,887 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0427
+2025-07-22 15:41:40,887 - TradingEngine-BTCUSDT - WARNING - ⏸️  Pausing trading: Volatility spike: 0.0427 > 0.0400
+2025-07-22 15:41:40,887 - TradingEngine-BTCUSDT - DEBUG - ❌ Cancelled 2 quotes
+2025-07-22 15:41:41,889 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0489
+2025-07-22 15:41:42,889 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0540
+2025-07-22 15:41:43,891 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0588
+2025-07-22 15:41:44,892 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0629
+2025-07-22 15:41:45,894 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0662
+2025-07-22 15:41:46,895 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0697
+2025-07-22 15:41:47,896 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0725
+2025-07-22 15:41:48,898 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0752
+2025-07-22 15:41:49,899 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0773
+2025-07-22 15:41:50,901 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0791
+2025-07-22 15:41:51,902 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0805
+2025-07-22 15:41:52,903 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0816
+2025-07-22 15:41:53,905 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0824
+2025-07-22 15:41:54,905 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0831
+2025-07-22 15:41:55,907 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0836
+2025-07-22 15:41:56,907 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0853
+2025-07-22 15:41:57,909 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0868
+2025-07-22 15:41:58,909 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0881
+2025-07-22 15:41:59,911 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0891
+2025-07-22 15:42:00,912 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0899
+2025-07-22 15:42:01,913 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0905
+2025-07-22 15:42:02,915 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0909
+2025-07-22 15:42:03,915 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0912
+2025-07-22 15:42:04,917 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0914
+2025-07-22 15:42:05,917 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0914
+2025-07-22 15:42:06,918 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0914
+2025-07-22 15:42:07,920 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0912
+2025-07-22 15:42:08,920 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0913
+2025-07-22 15:42:09,922 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0913
+2025-07-22 15:42:10,922 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0913
+2025-07-22 15:42:11,923 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0911
+2025-07-22 15:42:12,924 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0909
+2025-07-22 15:42:13,925 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0906
+2025-07-22 15:42:14,926 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0904
+2025-07-22 15:42:15,928 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0902
+2025-07-22 15:42:16,928 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0899
+2025-07-22 15:42:17,929 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0897
+2025-07-22 15:42:18,931 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0896
+2025-07-22 15:42:19,931 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0894
+2025-07-22 15:42:20,932 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0892
+2025-07-22 15:42:21,933 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0891
+2025-07-22 15:42:22,934 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0893
+2025-07-22 15:42:23,936 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0895
+2025-07-22 15:42:24,937 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0896
+2025-07-22 15:42:25,938 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0897
+2025-07-22 15:42:26,940 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0896
+2025-07-22 15:42:27,941 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0896
+2025-07-22 15:42:28,943 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0894
+2025-07-22 15:42:29,943 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0893
+2025-07-22 15:42:30,944 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0891
+2025-07-22 15:42:31,946 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0889
+2025-07-22 15:42:32,947 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0887
+2025-07-22 15:42:33,948 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0884
+2025-07-22 15:42:34,950 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0882
+2025-07-22 15:42:35,950 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0880
+2025-07-22 15:42:36,952 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0877
+2025-07-22 15:42:37,953 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0875
+2025-07-22 15:42:38,954 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0872
+2025-07-22 15:42:39,956 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0869
+2025-07-22 15:42:40,957 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0867
+2025-07-22 15:42:41,959 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0865
+2025-07-22 15:42:42,960 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0862
+2025-07-22 15:42:43,961 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0860
+2025-07-22 15:42:44,961 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0858
+2025-07-22 15:42:45,962 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0856
+2025-07-22 15:42:46,963 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0854
+2025-07-22 15:42:47,964 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0853
+2025-07-22 15:42:48,965 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0851
+2025-07-22 15:42:49,966 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0849
+2025-07-22 15:42:50,968 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0847
+2025-07-22 15:42:51,969 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0845
+2025-07-22 15:42:52,971 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0843
+2025-07-22 15:42:53,971 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0842
+2025-07-22 15:42:54,973 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0844
+2025-07-22 15:42:55,974 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0844
+2025-07-22 15:42:56,976 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0845
+2025-07-22 15:42:57,977 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0845
+2025-07-22 15:42:58,978 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0844
+2025-07-22 15:42:59,980 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0843
+2025-07-22 15:43:00,982 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0843
+2025-07-22 15:43:01,983 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0842
+2025-07-22 15:43:02,985 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0841
+2025-07-22 15:43:03,986 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0840
+2025-07-22 15:43:04,725 - TradingEngine-BTCUSDT - INFO - Trading loop cancelled
+2025-07-22 15:43:04,725 - TradingEngine-BTCUSDT - INFO - Trading loop stopped
+2025-07-22 15:47:05,501 - asyncio - DEBUG - Using selector: EpollSelector
+2025-07-22 15:47:05,502 - TradingEngine-BTCUSDT - INFO - 🚀 Starting trading loop for BTCUSDT
+2025-07-22 15:47:05,505 - urllib3.connectionpool - DEBUG - Starting new HTTPS connection (1): api.binance.com:443
+2025-07-22 15:47:05,750 - urllib3.connectionpool - DEBUG - https://api.binance.com:443 "GET /api/v3/depth?symbol=BTCUSDT&limit=1000 HTTP/1.1" 200 10198
+2025-07-22 15:47:05,751 - LocalBook-BTCUSDT - INFO - ✅ Snapshot récupéré: 1000 bids, 1000 asks, updateId=73275163840
+2025-07-22 15:47:05,751 - TradingEngine-BTCUSDT - INFO - ✅ Initialized: Mid=$119083.32
+2025-07-22 15:47:05,752 - TradingEngine-BTCUSDT - INFO - 🔄 Starting main trading loop
+2025-07-22 15:47:05,752 - TradingEngine-BTCUSDT - DEBUG - 📊 Quotes updated: Bid $119086.86@0.0100 | Ask $119086.86@0.0100 | OFI: 0.000 | Shift: 0.000000
+2025-07-22 15:47:05,852 - TradingEngine-BTCUSDT - DEBUG - ❌ Cancelled 2 quotes
+2025-07-22 15:47:05,852 - TradingEngine-BTCUSDT - DEBUG - 📊 Quotes updated: Bid $119061.76@0.0100 | Ask $119061.76@0.0100 | OFI: 0.000 | Shift: 0.000000
+2025-07-22 15:47:05,953 - TradingEngine-BTCUSDT - DEBUG - ❌ Cancelled 2 quotes
+2025-07-22 15:47:05,953 - TradingEngine-BTCUSDT - DEBUG - 📊 Quotes updated: Bid $119079.49@0.0100 | Ask $119079.49@0.0100 | OFI: 0.000 | Shift: 0.000000
+2025-07-22 15:47:06,053 - TradingEngine-BTCUSDT - DEBUG - ❌ Cancelled 2 quotes
+2025-07-22 15:47:06,053 - TradingEngine-BTCUSDT - DEBUG - 📊 Quotes updated: Bid $119064.26@0.0100 | Ask $119064.26@0.0100 | OFI: 0.000 | Shift: 0.000000
+2025-07-22 15:47:06,154 - TradingEngine-BTCUSDT - DEBUG - ❌ Cancelled 2 quotes
+2025-07-22 15:47:06,154 - TradingEngine-BTCUSDT - DEBUG - 📊 Quotes updated: Bid $119055.35@0.0100 | Ask $119055.35@0.0100 | OFI: 0.000 | Shift: 0.000000
+2025-07-22 15:47:06,254 - TradingEngine-BTCUSDT - DEBUG - ❌ Cancelled 2 quotes
+2025-07-22 15:47:06,254 - TradingEngine-BTCUSDT - DEBUG - 📊 Quotes updated: Bid $119049.94@0.0100 | Ask $119049.94@0.0100 | OFI: 0.000 | Shift: 0.000000
+2025-07-22 15:47:06,355 - TradingEngine-BTCUSDT - DEBUG - ❌ Cancelled 2 quotes
+2025-07-22 15:47:06,355 - TradingEngine-BTCUSDT - DEBUG - 📊 Quotes updated: Bid $119053.23@0.0100 | Ask $119053.23@0.0100 | OFI: 0.000 | Shift: 0.000000
+2025-07-22 15:47:06,455 - TradingEngine-BTCUSDT - DEBUG - ❌ Cancelled 2 quotes
+2025-07-22 15:47:06,455 - TradingEngine-BTCUSDT - DEBUG - 📊 Quotes updated: Bid $119059.84@0.0100 | Ask $119059.84@0.0100 | OFI: 0.000 | Shift: 0.000000
+2025-07-22 15:47:06,556 - TradingEngine-BTCUSDT - DEBUG - ❌ Cancelled 2 quotes
+2025-07-22 15:47:06,556 - TradingEngine-BTCUSDT - DEBUG - 📊 Quotes updated: Bid $119052.44@0.0100 | Ask $119052.44@0.0100 | OFI: 0.000 | Shift: 0.000000
+2025-07-22 15:47:06,656 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0275
+2025-07-22 15:47:06,657 - TradingEngine-BTCUSDT - DEBUG - ❌ Cancelled 2 quotes
+2025-07-22 15:47:06,657 - TradingEngine-BTCUSDT - DEBUG - 📊 Quotes updated: Bid $119057.53@0.0100 | Ask $119057.53@0.0100 | OFI: 0.000 | Shift: 0.000000
+2025-07-22 15:47:06,757 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0353
+2025-07-22 15:47:06,757 - TradingEngine-BTCUSDT - DEBUG - ❌ Cancelled 2 quotes
+2025-07-22 15:47:06,757 - TradingEngine-BTCUSDT - DEBUG - 📊 Quotes updated: Bid $119030.37@0.0100 | Ask $119030.37@0.0100 | OFI: 0.000 | Shift: 0.000000
+2025-07-22 15:47:06,858 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0432
+2025-07-22 15:47:06,858 - TradingEngine-BTCUSDT - WARNING - ⏸️  Pausing trading: Volatility spike: 0.0432 > 0.0400
+2025-07-22 15:47:06,858 - TradingEngine-BTCUSDT - DEBUG - ❌ Cancelled 2 quotes
+2025-07-22 15:47:07,858 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0498
+2025-07-22 15:47:08,860 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0555
+2025-07-22 15:47:09,861 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0606
+2025-07-22 15:47:10,862 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0650
+2025-07-22 15:47:11,863 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0692
+2025-07-22 15:47:12,864 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0727
+2025-07-22 15:47:13,865 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0755
+2025-07-22 15:47:14,866 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0778
+2025-07-22 15:47:15,868 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0797
+2025-07-22 15:47:16,869 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0812
+2025-07-22 15:47:17,870 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0824
+2025-07-22 15:47:18,871 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0832
+2025-07-22 15:47:19,873 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0843
+2025-07-22 15:47:20,874 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0851
+2025-07-22 15:47:21,875 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0856
+2025-07-22 15:47:22,876 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0860
+2025-07-22 15:47:23,877 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0863
+2025-07-22 15:47:24,879 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0864
+2025-07-22 15:47:25,880 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0864
+2025-07-22 15:47:26,881 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0863
+2025-07-22 15:47:27,882 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0861
+2025-07-22 15:47:28,884 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0859
+2025-07-22 15:47:29,885 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0857
+2025-07-22 15:47:30,886 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0856
+2025-07-22 15:47:31,886 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0855
+2025-07-22 15:47:32,887 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0853
+2025-07-22 15:47:33,889 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0855
+2025-07-22 15:47:34,890 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0858
+2025-07-22 15:47:35,891 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0861
+2025-07-22 15:47:36,892 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0863
+2025-07-22 15:47:37,894 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0865
+2025-07-22 15:47:38,895 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0865
+2025-07-22 15:47:39,896 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0865
+2025-07-22 15:47:40,898 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0866
+2025-07-22 15:47:41,898 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0867
+2025-07-22 15:47:42,900 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0866
+2025-07-22 15:47:43,901 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0866
+2025-07-22 15:47:44,903 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0865
+2025-07-22 15:47:45,903 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0865
+2025-07-22 15:47:46,904 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0865
+2025-07-22 15:47:47,905 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0865
+2025-07-22 15:47:48,907 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0865
+2025-07-22 15:47:49,907 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0865
+2025-07-22 15:47:50,909 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0865
+2025-07-22 15:47:51,910 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0864
+2025-07-22 15:47:52,911 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0865
+2025-07-22 15:47:53,913 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0864
+2025-07-22 15:47:54,914 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0864
+2025-07-22 15:47:55,914 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0863
+2025-07-22 15:47:56,915 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0862
+2025-07-22 15:47:57,917 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0862
+2025-07-22 15:47:58,919 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0861
+2025-07-22 15:47:59,920 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0860
+2025-07-22 15:48:00,921 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0858
+2025-07-22 15:48:01,923 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0857
+2025-07-22 15:48:02,924 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0855
+2025-07-22 15:48:03,926 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0854
+2025-07-22 15:48:04,927 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0855
+2025-07-22 15:48:05,928 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0854
+2025-07-22 15:48:06,929 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0854
+2025-07-22 15:48:07,930 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0854
+2025-07-22 15:48:08,931 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0853
+2025-07-22 15:48:09,933 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0853
+2025-07-22 15:48:10,933 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0853
+2025-07-22 15:48:11,935 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0853
+2025-07-22 15:48:12,935 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0853
+2025-07-22 15:48:13,937 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0853
+2025-07-22 15:48:14,937 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0853
+2025-07-22 15:48:15,938 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0854
+2025-07-22 15:48:16,939 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0854
+2025-07-22 15:48:17,940 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0854
+2025-07-22 15:48:18,941 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0854
+2025-07-22 15:48:19,942 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0853
+2025-07-22 15:48:20,943 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0852
+2025-07-22 15:48:21,945 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0852
+2025-07-22 15:48:22,945 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0851
+2025-07-22 15:48:23,946 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0851
+2025-07-22 15:48:24,947 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0850
+2025-07-22 15:48:25,949 - AS-BTCUSDT - DEBUG - Volatilité mise à jour: 0.0849
