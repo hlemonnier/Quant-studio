@@ -185,8 +185,10 @@ class AvellanedaStoikovQuoter:
         bid_price = reservation_price_shifted - half_spread
         ask_price = reservation_price_shifted + half_spread
         
-        # Calculer le spread en bps correctement
-        spread_bps = (optimal_spread / mid_price) * 10000
+        # Calculer le spread en bps
+        # optimal_spread est déjà une FRACTION (ex: 0.0005 pour 5 bps)
+        # Il suffit donc de multiplier par 10 000 pour obtenir les bps.
+        spread_bps = optimal_spread * 10000
         
         quotes = {
             'bid_price': bid_price,
