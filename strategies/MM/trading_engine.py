@@ -311,6 +311,9 @@ class TradingEngine:
             self.total_quotes_sent += 2
             self.last_quote_time = current_time
             
+            # Record quotes sent in KPI tracker
+            self.kpi_tracker.record_quotes_sent(2)
+            
             # Simulate quote acknowledgment latency
             ack_latency = np.random.normal(50, 20)  # 50ms ± 20ms
             self.kpi_tracker.record_latency('quote_ack', max(10, ack_latency))
