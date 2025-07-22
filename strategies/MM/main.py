@@ -5,11 +5,11 @@ Market Making V1 - Main Entry Point (Version 2)
 Version améliorée avec support multi-symboles et meilleure gestion du PnL.
 
 Usage:
-    python strategies/MM/main_v2.py --mode=paper-trading
-    python strategies/MM/main_v2.py --mode=paper-trading --symbol=all
-    python strategies/MM/main_v2.py --mode=paper-trading --symbol=ETHUSDT
-    python strategies/MM/main_v2.py --mode=backtest
-    python strategies/MM/main_v2.py --mode=calibration
+    python strategies/MM/main.py --mode=paper-trading
+    python strategies/MM/main.py --mode=paper-trading --symbol=all
+    python strategies/MM/main.py --mode=paper-trading --symbol=ETHUSDT
+    python strategies/MM/main.py --mode=backtest
+    python strategies/MM/main.py --mode=calibration
 
 Modes:
 - paper-trading: Real-time paper trading (no real orders)
