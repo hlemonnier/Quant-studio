@@ -216,6 +216,9 @@ class TradingEngine:
             
             # Update KPI tracker with current mid price for mark-to-market PnL
             self.kpi_tracker.update_mid_price(self.current_mid)
+            
+            # CORRIGÉ: Mettre à jour aussi l'InventoryController avec le prix mid
+            self.inventory_ctrl.update_mid_price(self.current_mid)
     
     def _check_risk_controls(self) -> Tuple[bool, str]:
         """Check all risk controls from §3.6"""
@@ -389,7 +392,8 @@ class TradingEngine:
             
             # Update inventory (bid = buy = positive, ask = sell = negative)
             inventory_change = fill.size if fill.side == 'bid' else -fill.size
-            self.inventory_ctrl.update_inventory(inventory_change, fill.price)
+            # CORRIGÉ: Passer le prix mid actuel pour le calcul mark-to-market
+            self.inventory_ctrl.update_inventory(inventory_change, fill.price, self.current_mid)
             
             # Record inventory for KPIs
             self.kpi_tracker.record_inventory(self.inventory_ctrl.current_inventory)
