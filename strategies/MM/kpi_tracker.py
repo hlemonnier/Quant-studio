@@ -61,6 +61,9 @@ class KPITracker:
         self._last_cleanup = time.time()
         self.cleanup_interval = 300  # Clean old data every 5 minutes
         
+        # Current market data for mark-to-market PnL
+        self.current_mid_price = 0.0
+        
     def record_fill(self, fill, mid_price: float, spread_captured: float):
         """Record a fill for KPI calculation"""
         fill_record = FillRecord(
@@ -107,6 +110,10 @@ class KPITracker:
         while (self.inventory_history and 
                time.time() - self.inventory_history[0][0] > self.window_seconds):
             self.inventory_history.popleft()
+    
+    def update_mid_price(self, mid_price: float):
+        """Update current mid price for mark-to-market PnL calculation"""
+        self.current_mid_price = mid_price
     
     def get_spread_captured_pct(self) -> float:
         """Calculate spread captured percentage (§3.7)"""
@@ -167,20 +174,25 @@ class KPITracker:
         return float(np.percentile(recent_latencies, 99))
     
     def get_total_pnl(self) -> float:
-        """Calculate total PnL from fills"""
+        """Calculate total PnL from fills using current mid price for mark-to-market"""
         if not self.fills:
             return 0.0
         
         recent_fills = self._get_recent_fills()
         pnl = 0.0
         
+        # Use current mid price if available, otherwise fall back to fill-time mid
+        mark_price = self.current_mid_price if self.current_mid_price > 0 else None
+        
         for fill in recent_fills:
             if fill.side == 'bid':
-                # Bought at fill.price, mark-to-market at mid
-                pnl += (fill.mid_price_at_fill - fill.price) * fill.size
+                # Bought at fill.price, mark-to-market at current mid
+                mid_to_use = mark_price if mark_price else fill.mid_price_at_fill
+                pnl += (mid_to_use - fill.price) * fill.size
             else:  # ask
-                # Sold at fill.price, mark-to-market at mid  
-                pnl += (fill.price - fill.mid_price_at_fill) * fill.size
+                # Sold at fill.price, mark-to-market at current mid  
+                mid_to_use = mark_price if mark_price else fill.mid_price_at_fill
+                pnl += (fill.price - mid_to_use) * fill.size
         
         return pnl
     

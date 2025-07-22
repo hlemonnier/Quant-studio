@@ -213,6 +213,9 @@ class TradingEngine:
             # Update quoter's price history for volatility estimation
             self.quoter.update_volatility(self.current_mid)
             self.current_volatility = self.quoter.sigma
+            
+            # Update KPI tracker with current mid price for mark-to-market PnL
+            self.kpi_tracker.update_mid_price(self.current_mid)
     
     def _check_risk_controls(self) -> Tuple[bool, str]:
         """Check all risk controls from §3.6"""
@@ -284,8 +287,8 @@ class TradingEngine:
             ask_id = f"ask_{self.quote_counter}"
             self.quote_counter += 1
             
-            # Cancel existing quotes first
-            await self._cancel_all_quotes()
+            # Cancel existing quotes first (normal update, don't count as cancellations)
+            await self._cancel_all_quotes(count_as_cancel=False)
             
             # Create new quotes
             bid_quote = Quote(
@@ -328,7 +331,7 @@ class TradingEngine:
         except Exception as e:
             self.logger.error(f"❌ Error updating quotes: {e}")
     
-    async def _cancel_all_quotes(self):
+    async def _cancel_all_quotes(self, count_as_cancel: bool = True):
         """Cancel all active quotes"""
         if not self.active_quotes:
             return
@@ -340,7 +343,8 @@ class TradingEngine:
                 cancelled_count += 1
         
         if cancelled_count > 0:
-            self.kpi_tracker.record_cancel(cancelled_count)
+            if count_as_cancel:
+                self.kpi_tracker.record_cancel(cancelled_count)
             self.logger.debug(f"❌ Cancelled {cancelled_count} quotes")
         
         self.active_quotes.clear()
@@ -386,6 +390,9 @@ class TradingEngine:
             # Update inventory (bid = buy = positive, ask = sell = negative)
             inventory_change = fill.size if fill.side == 'bid' else -fill.size
             self.inventory_ctrl.update_inventory(inventory_change, fill.price)
+            
+            # Record inventory for KPIs
+            self.kpi_tracker.record_inventory(self.inventory_ctrl.current_inventory)
             
             # Record fill for KPIs
             spread_at_fill = abs(fill.price - self.current_mid)
