@@ -78,6 +78,47 @@ class TradingEngine:
         self.total_fills = 0
         self.session_start = time.time()
         
+        # Control flag for trading loop
+        self.running = False
+        
+    async def run_trading_loop(self):
+        """Main entry point to run the trading loop"""
+        self.logger.info(f"🚀 Starting trading loop for {self.symbol}")
+        self.running = True
+        
+        try:
+            # Initialize market data
+            if not await self._initialize_market_data():
+                self.logger.error("❌ Failed to initialize market data")
+                return
+            
+            # Run main trading loop
+            await self._main_trading_loop()
+            
+        except asyncio.CancelledError:
+            self.logger.info("Trading loop cancelled")
+        except Exception as e:
+            self.logger.error(f"❌ Error in trading loop: {e}")
+        finally:
+            # Ensure we clean up on exit
+            await self._cancel_all_quotes()
+            self.logger.info("Trading loop stopped")
+    
+    async def stop(self):
+        """Gracefully stop the trading engine"""
+        self.logger.info("🛑 Stopping trading engine...")
+        self.running = False
+        
+        # Cancel all active quotes
+        await self._cancel_all_quotes()
+        
+        # Wait a bit to ensure all cancels are processed
+        await asyncio.sleep(0.5)
+        
+        # Print final status
+        self.print_status()
+        self.logger.info("✅ Trading engine stopped")
+    
     async def start(self):
         """Start the trading engine"""
         self.logger.info(f"🚀 Starting V1 Trading Engine for {self.symbol}")
@@ -112,7 +153,7 @@ class TradingEngine:
         """Main trading loop implementing §3.5"""
         self.logger.info("🔄 Starting main trading loop")
         
-        while True:
+        while self.running:
             try:
                 loop_start = time.time()
                 
@@ -409,14 +450,14 @@ async def test_trading_engine():
     # Run for 30 seconds
     print("🧪 Testing V1 Trading Engine for 30 seconds...")
     
-    start_task = asyncio.create_task(engine.start())
+    start_task = asyncio.create_task(engine.run_trading_loop())
     await asyncio.sleep(30)
+    
+    # Stop the engine
+    await engine.stop()
     
     # Print final status
     engine.print_status()
-    
-    # Cancel the task
-    start_task.cancel()
     print("✅ Test completed")
 
 
