@@ -103,7 +103,12 @@ class AvellanedaStoikovQuoter:
         
         return reservation_price
     
-    def compute_optimal_spread(self, inventory: float, time_remaining: float = None) -> float:
+    def compute_optimal_spread(
+        self,
+        mid_price: float,
+        inventory: float = 0.0,
+        time_remaining: float = None
+    ) -> float:
         """
         Calcule le **spread total coté** (2 × δ*) selon la solution fermée
         d'Avellaneda-Stoikov (§3.3 du cahier des charges) :
@@ -115,25 +120,20 @@ class AvellanedaStoikovQuoter:
         versions dépendantes de σ et (T-t) faisaient parfois tomber le spread
         à 0 bps, d'où la régression observée.
         """
-        # Demi-spread δ*
-        delta_star = (1 / self.gamma) * math.log(1 + self.gamma / self.k)
-        optimal_spread = 2 * delta_star
-        
-        # Contraintes min/max en valeur absolue (dollar)
-        # Convertir min/max de bps à dollar pour comparer avec optimal_spread
-        min_spread_bps = mm_config.min_spread_bps
-        max_spread_bps = mm_config.max_spread_bps
-        
-        # Pas besoin de mid_price ici car on compare en bps directement
-        spread_bps = optimal_spread * 10000  # Convertir en bps pour comparaison
-        
-        # Appliquer les limites en bps
-        clamped_spread_bps = max(min_spread_bps, min(max_spread_bps, spread_bps))
-        
-        # Reconvertir en fraction pour le retour
-        clamped_spread = clamped_spread_bps / 10000
-        
-        return clamped_spread
+        # 1️⃣ Calcule le spread **en dollars** (formule A&S)
+        delta_star = (1 / self.gamma) * math.log(1 + self.gamma / self.k)  # demi-spread $
+        spread_units = 2 * delta_star                                       # spread total $
+
+        # 2️⃣ Normalise en fraction du prix pour travailler en bps correctement
+        spread_fraction = spread_units / mid_price                          # ex: 0.0002
+        spread_bps = spread_fraction * 10000                                # ex: 2.0 bps
+
+        # 3️⃣ Applique limites mini/maxi en **bps**
+        spread_bps = max(mm_config.min_spread_bps,
+                         min(mm_config.max_spread_bps, spread_bps))
+
+        # 4️⃣ Retourne la fraction finale
+        return spread_bps / 10000
     
     def compute_quotes(self, mid_price: float, inventory: float,
                        time_remaining: float = None,
@@ -156,7 +156,10 @@ class AvellanedaStoikovQuoter:
         else:
             # Recalculer
             reservation_price = self.compute_reservation_price(mid_price, inventory, time_remaining)
-            optimal_spread = self.compute_optimal_spread(inventory, time_remaining)
+            # ⬇️  Nouvelle signature : le premier argument est désormais mid_price
+            optimal_spread = self.compute_optimal_spread(mid_price,
+                                                         inventory,
+                                                         time_remaining)
             
             # Mettre en cache
             self._cached_reservation_price = reservation_price
