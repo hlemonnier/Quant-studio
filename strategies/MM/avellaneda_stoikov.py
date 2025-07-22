@@ -15,7 +15,7 @@ import math
 from datetime import datetime, timedelta
 import logging
 from .config import mm_config
-from .ofi import OFICalculator   # Helper for users – quoter only consumes OFI value
+from .ofi import OFICalculator   # noqa – only for typing & external access
 
 class AvellanedaStoikovQuoter:
     """
@@ -105,23 +105,19 @@ class AvellanedaStoikovQuoter:
     
     def compute_optimal_spread(self, inventory: float, time_remaining: float = None) -> float:
         """
-        Calcule le spread optimal δ selon Avellaneda-Stoikov
+        Calcule le **spread total coté** (2 × δ*) selon la solution fermée
+        d'Avellaneda-Stoikov (§3.3 du cahier des charges) :
+            δ* = (1/γ) · ln(1 + γ/k)      ← demi-spread théorique
+            spread_total = 2 · δ*
         
-        δ = γ * σ² * (T - t) + (2/γ) * ln(1 + γ/k)
-        
-        Le premier terme gère le risque d'inventaire
-        Le second terme gère l'impact de marché
+        Cette formule **ne dépend pas** de l'inventaire ni du temps restant
+        pour la V1 (horizon maintenu court dans la config). Les anciennes
+        versions dépendantes de σ et (T-t) faisaient parfois tomber le spread
+        à 0 bps, d'où la régression observée.
         """
-        if time_remaining is None:
-            time_remaining = self.T
-        
-        # Terme de risque d'inventaire
-        risk_term = self.gamma * (self.sigma ** 2) * time_remaining
-        
-        # Terme d'impact de marché
-        impact_term = (2 / self.gamma) * math.log(1 + self.gamma / self.k)
-        
-        optimal_spread = risk_term + impact_term
+        # Demi-spread δ*
+        delta_star = (1 / self.gamma) * math.log(1 + self.gamma / self.k)
+        optimal_spread = 2 * delta_star
         
         # Contraintes min/max
         min_spread = mm_config.min_spread_bps / 10000  # Convertir bps en fraction
@@ -131,9 +127,7 @@ class AvellanedaStoikovQuoter:
         
         return optimal_spread
     
-    def compute_quotes(self,
-                       mid_price: float,
-                       inventory: float,
+    def compute_quotes(self, mid_price: float, inventory: float,
                        time_remaining: float = None,
                        ofi: float = 0.0) -> Dict[str, float]:
         """
@@ -145,7 +139,7 @@ class AvellanedaStoikovQuoter:
         où r = prix de réservation, δ = spread optimal
         """
         # Utiliser le cache si les paramètres n'ont pas changé
-        cache_key = (mid_price, inventory, time_remaining)
+        cache_key = (mid_price, inventory, time_remaining, ofi)
         if (self._cached_reservation_price is not None and 
             self._cache_inventory == inventory and
             abs(self._cached_reservation_price - mid_price) < 0.01):
@@ -164,18 +158,19 @@ class AvellanedaStoikovQuoter:
         
         # Calculer bid et ask
         half_spread = optimal_spread / 2
+
         # ------------------------------------------------------------------
-        # 3️⃣  Centre shift based on OFI  (§3.3bis of the spec)
+        # Centre-shift basé sur l'Order-Flow Imbalance  (§3.3bis)
         # ------------------------------------------------------------------
         tick_size = mm_config.get_symbol_config(self.symbol).get(
             "tick_size", mm_config.default_tick_size
         )
-        max_shift = tick_size  # ±1 tick
-        center_shift = np.clip(mm_config.beta_ofi * ofi * tick_size, -max_shift, max_shift)
+        max_shift = tick_size                  # ±1 tick
+        center_shift = np.clip(mm_config.beta_ofi * ofi * tick_size,
+                               -max_shift, max_shift)
 
         reservation_price_shifted = reservation_price + center_shift
 
-        # Final bid / ask
         bid_price = reservation_price_shifted - half_spread
         ask_price = reservation_price_shifted + half_spread
         
@@ -185,9 +180,9 @@ class AvellanedaStoikovQuoter:
             'reservation_price': reservation_price,
             'reservation_price_shifted': reservation_price_shifted,
             'optimal_spread': optimal_spread,
-            'ofi': ofi,
-            'center_shift': center_shift,
             'spread_bps': (optimal_spread / mid_price) * 10000,
+            'center_shift': center_shift,
+            'ofi': ofi,
             'mid_price': mid_price,
             'inventory': inventory,
             'volatility': self.sigma,

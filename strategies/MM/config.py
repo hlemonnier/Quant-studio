@@ -24,24 +24,13 @@ class MMConfig:
         # Avellaneda-Stoikov Parameters
         self.gamma = 0.1  # Risk aversion - À définir avec le boss
         self.sigma = 0.02  # Volatility estimate (initial)
-        self.T = 1.0  # Time horizon (1 day normalized)
+        # Time horizon – 2 minutes ≈ 120 s (expressed as *fraction* of a day for the
+        # analytical A&S formulas : 120 / 86 400 ≃ 0.00139)
+        # A full-day horizon (=1.0) made the optimal-spread almost zero → quotes too tight.
+        # Setting a shorter horizon fixes the “spread = 0.0 bps” issue observed in back-tests.
+        self.T = 120 / 86400
         self.k = 1.5  # Market impact parameter
         
-        # ------------------------------------------------------------------
-        # Order-Flow Imbalance (OFI) signal configuration  🔄
-        # ------------------------------------------------------------------
-        # Price-centre shift coefficient (in *ticks* per unit OFI)
-        self.beta_ofi = 0.3
-
-        # Look-back window used to compute the OFI (seconds)
-        self.ofi_window_seconds = 1
-
-        # Clamp the normalised OFI to ±N standard deviations (robust to outliers)
-        self.ofi_clamp_std = 3.0
-
-        # Default tick-size (used as fall-back if symbol specific lookup fails)
-        self.default_tick_size = 0.01
-
         # Inventory Control
         self.inventory_target = 0.0  # Target inventory
         self.max_inventory = 1.0  # Maximum inventory (À définir: N_max)
@@ -57,6 +46,18 @@ class MMConfig:
         self.max_spread_bps = 200  # Spread maximum en basis points
         self.min_spread_bps = 5  # Spread minimum en basis points (plus réaliste)
         self.stop_loss_pct = 5.0  # Stop loss en pourcentage
+
+        # ------------------------------------------------------------------
+        # Order-Flow Imbalance (OFI) parameters  (§3.3bis)
+        # ------------------------------------------------------------------
+        # Coefficient β : nb de *ticks* de déplacement du centre par unité d’OFI
+        self.beta_ofi = 0.30
+        # Fenêtre (s) pour le calcul de l’OFI
+        self.ofi_window_seconds = 1.0
+        # Clamp du z-score de l’OFI pour éviter les outliers
+        self.ofi_clamp_std = 3.0
+        # Tick-size par défaut (fallback si lookup symbole indisponible)
+        self.default_tick_size = 0.01
         
         # Data Storage
         self.data_dir = 'data/mm_data'
@@ -111,7 +112,7 @@ class MMConfig:
         print(f"Inventory Threshold (N★): {self.inventory_threshold}")
         print(f"Spread range: {self.min_spread_bps}-{self.max_spread_bps} bps")
         print(f"Base quote size: {self.base_quote_size}")
-        print(f"OFI β: {self.beta_ofi}  |  Window: {self.ofi_window_seconds}s  |  Clamp: ±{self.ofi_clamp_std}σ")
+        print(f"OFI β: {self.beta_ofi} | Window: {self.ofi_window_seconds}s | Clamp: ±{self.ofi_clamp_std}σ")
         print("=" * 40)
 
 # Instance globale de configuration
