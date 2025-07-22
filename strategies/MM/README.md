@@ -4,7 +4,7 @@
 ```
 strategies/MM/
 ├── config.py                 # ⚙️ Configuration centralisée
-├── main.py                   # 🚀 Point d’entrée principal
+├── main_v2.py                   # 🚀 Point d’entrée principal
 ├── avellaneda_stoikov.py     # 📊 Calculs A&S + OFI
 ├── trading_engine.py         # 🔄 Moteur de trading temps-réel
 ├── kpi_tracker.py            # 📈 Suivi des performances
@@ -58,26 +58,26 @@ self.ofi_window_seconds = 1.0  # Fenêtre de calcul
 
 ### Paper Trading (recommandé)
 ```bash
-python strategies/MM/main.py --mode=paper-trading
-python strategies/MM/main.py --mode=paper-trading --duration=2          # 2 h
-python strategies/MM/main.py --mode=paper-trading --symbol=ETHUSDT
+python strategies/MM/main_v2.py --mode=paper-trading
+python strategies/MM/main_v2.py --mode=paper-trading --duration=2          # 2 h
+python strategies/MM/main_v2.py --mode=paper-trading --symbol=ETHUSDT
 ```
 
 ### Backtesting
 ```bash
-python strategies/MM/main.py --mode=backtest
+python strategies/MM/main_v2.py --mode=backtest
 ```
 
 ### Calibration
 ```bash
-python strategies/MM/main.py --mode=calibration
+python strategies/MM/main_v2.py --mode=calibration
 ```
 
 ### Live Trading ⚠️
 ```bash
 export BINANCE_API_KEY="your_key"
 export BINANCE_API_SECRET="your_secret"
-python strategies/MM/main.py --mode=live --symbol=BTCUSDT
+python strategies/MM/main_v2.py --mode=live --symbol=BTCUSDT
 ```
 
 ---
@@ -137,7 +137,7 @@ self.min_spread_bps = 3
 self.symbols.append('ADAUSDT')
 ```
 ```bash
-python strategies/MM/main.py --mode=paper-trading --symbol=ADAUSDT
+python strategies/MM/main_v2.py --mode=paper-trading --symbol=ADAUSDT
 ```
 
 ---
@@ -156,10 +156,10 @@ python strategies/MM/main.py --mode=paper-trading --symbol=ADAUSDT
 ## 📈 Workflow conseillé
 
 1. `pytest strategies/MM/tests -v`  
-2. `python strategies/MM/main.py --mode=backtest`  
-3. `python strategies/MM/main.py --mode=calibration`  
-4. `python strategies/MM/main.py --mode=paper-trading --duration=1`  
-5. `python strategies/MM/main.py --mode=live` *(après validation)*  
+2. `python strategies/MM/main_v2.py --mode=backtest`  
+3. `python strategies/MM/main_v2.py --mode=calibration`  
+4. `python strategies/MM/main_v2.py --mode=paper-trading --duration=1`  
+5. `python strategies/MM/main_v2.py --mode=live` *(après validation)*  
 
 ---
 
