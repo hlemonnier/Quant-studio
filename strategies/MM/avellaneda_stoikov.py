@@ -15,7 +15,7 @@ import math
 from datetime import datetime, timedelta
 import logging
 from .config import mm_config
-from .ofi import OFICalculator   # noqa – only for typing & external access
+from .ofi import OFICalculator   # Helper for users – quoter only consumes OFI value
 
 class AvellanedaStoikovQuoter:
     """
@@ -119,13 +119,21 @@ class AvellanedaStoikovQuoter:
         delta_star = (1 / self.gamma) * math.log(1 + self.gamma / self.k)
         optimal_spread = 2 * delta_star
         
-        # Contraintes min/max
-        min_spread = mm_config.min_spread_bps / 10000  # Convertir bps en fraction
-        max_spread = mm_config.max_spread_bps / 10000
+        # Contraintes min/max en valeur absolue (dollar)
+        # Convertir min/max de bps à dollar pour comparer avec optimal_spread
+        min_spread_bps = mm_config.min_spread_bps
+        max_spread_bps = mm_config.max_spread_bps
         
-        optimal_spread = max(min_spread, min(max_spread, optimal_spread))
+        # Pas besoin de mid_price ici car on compare en bps directement
+        spread_bps = optimal_spread * 10000  # Convertir en bps pour comparaison
         
-        return optimal_spread
+        # Appliquer les limites en bps
+        clamped_spread_bps = max(min_spread_bps, min(max_spread_bps, spread_bps))
+        
+        # Reconvertir en fraction pour le retour
+        clamped_spread = clamped_spread_bps / 10000
+        
+        return clamped_spread
     
     def compute_quotes(self, mid_price: float, inventory: float,
                        time_remaining: float = None,
@@ -158,7 +166,7 @@ class AvellanedaStoikovQuoter:
         
         # Calculer bid et ask
         half_spread = optimal_spread / 2
-
+        
         # ------------------------------------------------------------------
         # Centre-shift basé sur l'Order-Flow Imbalance  (§3.3bis)
         # ------------------------------------------------------------------
@@ -174,13 +182,16 @@ class AvellanedaStoikovQuoter:
         bid_price = reservation_price_shifted - half_spread
         ask_price = reservation_price_shifted + half_spread
         
+        # Calculer le spread en bps correctement
+        spread_bps = (optimal_spread / mid_price) * 10000
+        
         quotes = {
             'bid_price': bid_price,
             'ask_price': ask_price,
             'reservation_price': reservation_price,
             'reservation_price_shifted': reservation_price_shifted,
             'optimal_spread': optimal_spread,
-            'spread_bps': (optimal_spread / mid_price) * 10000,
+            'spread_bps': spread_bps,
             'center_shift': center_shift,
             'ofi': ofi,
             'mid_price': mid_price,
@@ -239,7 +250,7 @@ class AvellanedaStoikovQuoter:
             self.logger.warning(f"⚠️  Prix trop éloignés du mid: bid={quotes['bid_price']:.2f}, ask={quotes['ask_price']:.2f}, mid={current_mid:.2f}")
             return False
         
-        # Vérifier le spread
+        # Vérifier le spread en bps (pas en valeur absolue)
         spread_bps = quotes['spread_bps']
         if spread_bps < mm_config.min_spread_bps or spread_bps > mm_config.max_spread_bps:
             self.logger.warning(f"⚠️  Spread hors limites: {spread_bps:.1f}bps")
@@ -286,6 +297,8 @@ def quick_quote_test():
     print(f"Ask: ${quotes['ask_price']:.2f}")
     print(f"Spread: ${quotes['optimal_spread']:.4f} ({quotes['spread_bps']:.1f} bps)")
     print(f"Volatility: {quotes['volatility']:.4f}")
+    print(f"OFI: {quotes['ofi']:.4f}")
+    print(f"Center Shift: {quotes['center_shift']:.6f}")
     
     # Test avec différents inventaires
     print("\n📈 Impact de l'inventaire:")
@@ -294,4 +307,4 @@ def quick_quote_test():
         print(f"Inventory {inv:+.1f}: Bid=${q['bid_price']:.2f}, Ask=${q['ask_price']:.2f}, Reservation=${q['reservation_price']:.2f}")
 
 if __name__ == "__main__":
-    quick_quote_test() 
+    quick_quote_test()
