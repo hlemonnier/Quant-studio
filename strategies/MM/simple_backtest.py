@@ -112,12 +112,14 @@ async def simple_backtest(market_data: pd.DataFrame) -> dict:
         
         if quotes and quoter.validate_quotes(quotes, mid_price):
             quote_count += 1
+            # Enregistrer les quotes envoyées (bid + ask = 2 quotes)
+            kpi_tracker.record_quotes_sent(2)
             
             # Taille par défaut pour les trades
             default_size = 0.01  # 0.01 BTC
             
-            # Simuler des fills simples (probabilité réduite pour test)
-            fill_prob = 0.001  # 0.1% de chance de fill par tick
+            # Simuler des fills simples (probabilité réaliste pour test)
+            fill_prob = 0.005  # 0.5% de chance de fill par tick
             
             # Fill bid
             if np.random.random() < fill_prob:

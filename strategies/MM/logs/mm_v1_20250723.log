@@ -1,0 +1,34 @@
+2025-07-23 13:49:55,521 - ParamCalibrator-BTCUSDT - INFO - 🚀 Starting full parameter calibration for BTCUSDT
+2025-07-23 13:49:55,521 - ParamCalibrator-BTCUSDT - INFO - 🔧 Calibrating market impact parameter k...
+2025-07-23 13:49:55,528 - ParamCalibrator-BTCUSDT - INFO - ✅ k calibrated: 0.420 (R²=0.884)
+2025-07-23 13:49:55,528 - ParamCalibrator-BTCUSDT - INFO - 🔧 Calibrating risk aversion parameter γ...
+2025-07-23 13:49:55,530 - ParamCalibrator-BTCUSDT - INFO - ✅ γ calibrated: 0.00001
+2025-07-23 13:49:55,530 - ParamCalibrator-BTCUSDT - INFO -    Best Sharpe: 2115.208
+2025-07-23 13:49:55,530 - ParamCalibrator-BTCUSDT - INFO -    RMS Inventory: 0.3491
+2025-07-23 13:49:55,531 - ParamCalibrator-BTCUSDT - INFO - 🔧 Calibrating time horizon T...
+2025-07-23 13:49:55,531 - ParamCalibrator-BTCUSDT - INFO - ✅ T calibrated: 0.000694 (60s)
+2025-07-23 13:49:55,531 - ParamCalibrator-BTCUSDT - INFO - Applied k = 0.42018591773002567
+2025-07-23 13:49:55,531 - ParamCalibrator-BTCUSDT - INFO - Applied gamma = 9.999999999999999e-06
+2025-07-23 13:49:55,531 - ParamCalibrator-BTCUSDT - INFO - Applied T = 0.0006944444444444445
+2025-07-23 13:49:55,532 - ParamCalibrator-BTCUSDT - INFO - 📁 Calibrated parameters saved to /tmp/hlemonnier/Quant-studio/parameters/calibrated_mm.json
+2025-07-23 13:49:55,532 - ParamCalibrator-BTCUSDT - INFO - ✅ Full calibration completed
+2025-07-23 13:49:55,533 - ParamCalibrator-ETHUSDT - INFO - 🚀 Starting full parameter calibration for ETHUSDT
+2025-07-23 13:49:55,533 - ParamCalibrator-ETHUSDT - INFO - 🔧 Calibrating market impact parameter k...
+2025-07-23 13:49:55,534 - ParamCalibrator-ETHUSDT - INFO - ✅ k calibrated: 0.425 (R²=0.697)
+2025-07-23 13:49:55,535 - ParamCalibrator-ETHUSDT - INFO - 🔧 Calibrating risk aversion parameter γ...
+2025-07-23 13:49:55,536 - ParamCalibrator-ETHUSDT - INFO - ✅ γ calibrated: 0.00001
+2025-07-23 13:49:55,537 - ParamCalibrator-ETHUSDT - INFO -    Best Sharpe: 1448.135
+2025-07-23 13:49:55,537 - ParamCalibrator-ETHUSDT - INFO -    RMS Inventory: 0.2191
+2025-07-23 13:49:55,537 - ParamCalibrator-ETHUSDT - INFO - 🔧 Calibrating time horizon T...
+2025-07-23 13:49:55,537 - ParamCalibrator-ETHUSDT - INFO - ✅ T calibrated: 0.000694 (60s)
+2025-07-23 13:49:55,537 - ParamCalibrator-ETHUSDT - INFO - Applied k = 0.42484674863675703
+2025-07-23 13:49:55,537 - ParamCalibrator-ETHUSDT - INFO - Applied gamma = 9.999999999999999e-06
+2025-07-23 13:49:55,537 - ParamCalibrator-ETHUSDT - INFO - Applied T = 0.0006944444444444445
+2025-07-23 13:49:55,540 - ParamCalibrator-ETHUSDT - INFO - 📁 Calibrated parameters saved to /tmp/hlemonnier/Quant-studio/parameters/calibrated_mm.json
+2025-07-23 13:49:55,540 - ParamCalibrator-ETHUSDT - INFO - ✅ Full calibration completed
+2025-07-23 13:49:55,541 - TradingEngine-BTCUSDT - INFO - 🚀 Starting trading loop for BTCUSDT
+2025-07-23 13:49:55,573 - LocalBook-BTCUSDT - ERROR - ❌ Erreur récupération snapshot: 451 Client Error:  for url: https://api.binance.com/api/v3/depth?symbol=BTCUSDT&limit=1000
+2025-07-23 13:49:55,573 - TradingEngine-BTCUSDT - ERROR - ❌ Failed to initialize market data
+2025-07-23 13:49:55,573 - TradingEngine-BTCUSDT - INFO - Trading loop stopped
+2025-07-23 13:49:55,574 - TradingEngine-BTCUSDT - INFO - 🛑 Stopping trading engine...
+2025-07-23 13:49:56,076 - TradingEngine-BTCUSDT - INFO - ✅ Trading engine stopped

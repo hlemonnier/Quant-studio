@@ -378,7 +378,9 @@ class TradingEngine:
                 distance_from_mid = (quote.price - self.current_mid) / self.current_mid
             
             # Base fill probability decreases with distance from mid
-            fill_prob = max(0.001, 0.02 - distance_from_mid * 100)  # 2% base, reduced by distance
+            # Pour un spread typique de 5 bps (0.0005), distance_from_mid = 0.00025
+            # On veut une probabilité raisonnable, par exemple 1% par tick pour des quotes compétitives
+            fill_prob = max(0.005, 0.05 - distance_from_mid * 50)  # 5% base, réduit par distance
             
             if np.random.random() < fill_prob:
                 # Simulate partial fill
