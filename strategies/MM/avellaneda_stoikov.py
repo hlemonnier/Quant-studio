@@ -58,28 +58,49 @@ class AvellanedaStoikovQuoter:
         if len(self.price_history) > self.volatility_window:
             self.price_history = self.price_history[-self.volatility_window:]
         
-        # Recalculer la volatilité si on a assez de données
-        if len(self.price_history) >= 10:
+        # Recalculer la volatilité dès qu'on a au moins 2 observations (V1-α)
+        if len(self.price_history) >= 2:
             self._estimate_volatility()
     
     def _estimate_volatility(self):
-        """Estime la volatilité à partir de l'historique des prix"""
-        if len(self.price_history) < 10:
+        """
+        Estime la volatilité avec EWMA sur exactement 100 observations (§3.2 V1-α)
+        Conforme au cahier des charges : "EWMA 100 observations ajustée every tick"
+        """
+        if len(self.price_history) < 2:
             return
         
         prices = [p['price'] for p in self.price_history]
         log_returns = np.diff(np.log(prices))
         
-        # Volatilité annualisée (en supposant des updates toutes les 100ms)
-        # 1 jour = 86400 secondes, donc 864000 updates de 100ms
+        # EWMA avec exactement les observations disponibles (max 100)
+        # Facteur de décroissance pour EWMA : α = 2/(N+1) où N=100
+        alpha_ewma = 2.0 / (100 + 1)  # ≈ 0.0198
+        
+        if len(log_returns) == 1:
+            # Premier return : initialiser avec la variance simple
+            ewma_variance = log_returns[0] ** 2
+        else:
+            # Calcul EWMA récursif sur les returns
+            ewma_variance = 0.0
+            weights_sum = 0.0
+            
+            for i, ret in enumerate(reversed(log_returns)):
+                weight = (1 - alpha_ewma) ** i
+                ewma_variance += weight * (ret ** 2)
+                weights_sum += weight
+                
+            ewma_variance /= weights_sum
+        
+        # Volatilité annualisée (updates toutes les 100ms selon §3.2)
+        # 1 jour = 86400 secondes = 864000 updates de 100ms
         periods_per_day = 864000
-        volatility_daily = np.std(log_returns) * np.sqrt(periods_per_day)
+        volatility_daily = np.sqrt(ewma_variance * periods_per_day)
         
-        # Mise à jour avec lissage exponentiel
-        alpha = 0.1  # Facteur de lissage
-        self.sigma = alpha * volatility_daily + (1 - alpha) * self.sigma
+        # Mise à jour directe (pas de lissage supplémentaire car EWMA déjà lissé)
+        self.sigma = volatility_daily
         
-        self.logger.debug(f"Volatilité mise à jour: {self.sigma:.4f}")
+        self.logger.debug(f"📊 Volatilité EWMA-100: {self.sigma:.4f} (sur {len(log_returns)} obs)")
     
     def compute_reservation_price(self, mid_price: float, inventory: float, 
                                  time_remaining: float = None) -> float:

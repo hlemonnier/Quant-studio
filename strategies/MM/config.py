@@ -23,6 +23,10 @@ class MMConfig:
         self.ws_update_speed = '100ms'  # 100ms
         self.reconnect_attempts = 5
         
+        # Real-time constraints (§3.2 V1-α)
+        self.max_mid_price_latency_ms = 50  # ≤50ms pour mid-price
+        self.max_quote_latency_ms = 300     # ≤300ms pour quotes (kill-switch)
+        
         # Avellaneda-Stoikov Parameters
         self.gamma = 0.1  # Risk aversion - À définir avec le boss
         # Volatility estimate (initial). 5 % is more realistic for intra-day crypto
@@ -71,6 +75,13 @@ class MMConfig:
         self.data_dir = 'data/mm_data'
         self.parquet_compression = 'snappy'
         self.save_interval_seconds = 30  # Sauvegarde toutes les 30 secondes
+        
+        # Performance targets (§3.7 V1-α)
+        self.target_spread_capture_pct = 70.0    # ≥70% spread capture
+        self.target_rms_inventory_ratio = 0.4    # ≤0.4 q_max RMS inventory
+        self.target_fill_ratio_pct = 5.0         # ≥5% fill ratio
+        self.target_cancel_ratio_pct = 70.0      # ≤70% cancel ratio
+        self.target_latency_p99_ms = 300.0       # ≤300ms P99 latency
         
         # Backtesting
         self.backtest_latency_ms = 0  # Latence 0 pour la V1
@@ -127,4 +138,4 @@ class MMConfig:
         print("=" * 40)
 
 # Instance globale de configuration
-mm_config = MMConfig() 
+mm_config = MMConfig()

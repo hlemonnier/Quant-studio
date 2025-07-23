@@ -65,6 +65,7 @@ class TradingEngine:
         # Trading state
         self.active_quotes: Dict[str, Quote] = {}
         self.current_mid = 0.0
+        self.last_mid_price_latency_ms = 0.0  # Pour contrôle latence V1-α
         self.current_volatility = mm_config.sigma
         self.last_quote_time = 0.0
         self.quote_counter = 0
@@ -210,6 +211,10 @@ class TradingEngine:
             change_pct = np.random.normal(0, 0.0001)  # 0.01% std dev
             self.current_mid *= (1 + change_pct)
             
+            # Simuler la latence mid-price (§3.2 V1-α)
+            # En mode simulation, on génère une latence aléatoire
+            self.last_mid_price_latency_ms = np.random.uniform(10, 80)  # 10-80ms
+            
             # Update quoter's price history for volatility estimation
             self.quoter.update_volatility(self.current_mid)
             self.current_volatility = self.quoter.sigma
@@ -236,10 +241,22 @@ class TradingEngine:
                 f"> {mm_config.max_volatility_threshold:.4f}"
             )
         
-        # 3. Latency check (simulated)
+        # 3. Latency checks (§3.2 V1-α)
+        # 3a. Mid-price latency ≤50ms
+        if hasattr(self, 'last_mid_price_latency_ms'):
+            if self.last_mid_price_latency_ms > mm_config.max_mid_price_latency_ms:
+                return True, (
+                    f"Mid-price latency: {self.last_mid_price_latency_ms:.1f}ms "
+                    f"> {mm_config.max_mid_price_latency_ms}ms"
+                )
+        
+        # 3b. Quote latency ≤300ms (kill-switch)
         avg_latency = self.kpi_tracker.get_average_latency('quote_ack')
-        if avg_latency > 300:  # 300ms threshold
-            return True, f"High latency: {avg_latency:.1f}ms > 300ms"
+        if avg_latency > mm_config.max_quote_latency_ms:
+            return True, (
+                f"Quote latency: {avg_latency:.1f}ms "
+                f"> {mm_config.max_quote_latency_ms}ms"
+            )
         
         return False, ""
     

@@ -19,6 +19,9 @@ import numpy as np
 import time
 import logging
 
+from strategies.MM.config import MMConfig
+mm_config = MMConfig()
+
 
 @dataclass
 class FillRecord:
@@ -222,11 +225,11 @@ class KPITracker:
         summary = self.get_summary()
         
         targets = {
-            'spread_captured_target': summary['spread_captured_pct'] >= 70.0,  # ≥ 70%
-            'rms_inventory_target': summary['rms_inventory'] <= 0.4,  # ≤ 0.4 q_max  
-            'fill_ratio_target': summary['fill_ratio'] >= 0.05,  # ≥ 5%
-            'cancel_ratio_target': summary['cancel_ratio'] <= 0.70,  # ≤ 70%
-            'latency_target': self.get_p99_latency('quote_ack') <= 300.0,  # ≤ 300ms P99
+            'spread_captured_target': summary['spread_captured_pct'] >= mm_config.target_spread_capture_pct,
+            'rms_inventory_target': summary['rms_inventory'] <= mm_config.target_rms_inventory_ratio,
+            'fill_ratio_target': summary['fill_ratio'] >= (mm_config.target_fill_ratio_pct / 100.0),
+            'cancel_ratio_target': summary['cancel_ratio'] <= (mm_config.target_cancel_ratio_pct / 100.0),
+            'latency_target': self.get_p99_latency('quote_ack') <= mm_config.target_latency_p99_ms,
             'pnl_target': summary['total_pnl'] >= 0.0  # Positive PnL
         }
         
@@ -240,15 +243,19 @@ class KPITracker:
         print(f"\n📊 {self.symbol} Performance Report (Last {self.window_seconds/60:.0f}min)")
         print("=" * 60)
         
-        # Core KPIs
+        # Core KPIs (§3.7 V1-α targets)
         print(f"Spread Captured: {summary['spread_captured_pct']:.1f}% " +
-              f"{'✅' if targets['spread_captured_target'] else '❌'} (Target: ≥70%)")
+              f"{'✅' if targets['spread_captured_target'] else '❌'} " +
+              f"(Target: ≥{mm_config.target_spread_capture_pct:.0f}%)")
         print(f"RMS Inventory: {summary['rms_inventory']:.4f} " +
-              f"{'✅' if targets['rms_inventory_target'] else '❌'} (Target: ≤0.4)")
+              f"{'✅' if targets['rms_inventory_target'] else '❌'} " +
+              f"(Target: ≤{mm_config.target_rms_inventory_ratio:.1f})")
         print(f"Fill Ratio: {summary['fill_ratio']:.1%} " +
-              f"{'✅' if targets['fill_ratio_target'] else '❌'} (Target: ≥5%)")
+              f"{'✅' if targets['fill_ratio_target'] else '❌'} " +
+              f"(Target: ≥{mm_config.target_fill_ratio_pct:.0f}%)")
         print(f"Cancel Ratio: {summary['cancel_ratio']:.1%} " +
-              f"{'✅' if targets['cancel_ratio_target'] else '❌'} (Target: ≤70%)")
+              f"{'✅' if targets['cancel_ratio_target'] else '❌'} " +
+              f"(Target: ≤{mm_config.target_cancel_ratio_pct:.0f}%)")
         
         # PnL
         pnl_emoji = "💰" if summary['total_pnl'] >= 0 else "📉"
