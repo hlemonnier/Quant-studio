@@ -10,8 +10,8 @@ from typing import Dict, List, Tuple, Optional
 from datetime import datetime, timedelta
 import numpy as np
 
-from strategies.MM.config import MMConfig
-from strategies.MM.kpi_tracker import KPITracker
+from config import MMConfig
+from kpi_tracker import KPITracker
 
 mm_config = MMConfig()
 
@@ -252,7 +252,7 @@ class PerformanceValidator:
 
 def quick_validation_test():
     """Quick test of the validation system"""
-    from strategies.MM.kpi_tracker import KPITracker
+    from kpi_tracker import KPITracker
     
     # Create test tracker with some data
     tracker = KPITracker('BTCUSDT')
@@ -267,4 +267,3 @@ def quick_validation_test():
 
 if __name__ == "__main__":
     quick_validation_test()
-

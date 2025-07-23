@@ -19,7 +19,7 @@ import numpy as np
 import time
 import logging
 
-from strategies.MM.config import MMConfig
+from config import MMConfig
 mm_config = MMConfig()
 
 

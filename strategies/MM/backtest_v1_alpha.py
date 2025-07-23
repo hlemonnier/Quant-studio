@@ -21,11 +21,11 @@ import time
 import json
 from pathlib import Path
 
-from strategies.MM.config import MMConfig
-from strategies.MM.avellaneda_stoikov import AvellanedaStoikovQuoter
-from strategies.MM.kpi_tracker import KPITracker
-from strategies.MM.performance_validator import PerformanceValidator
-from strategies.MM.inventory_control import InventoryController
+from config import MMConfig
+from avellaneda_stoikov import AvellanedaStoikovQuoter
+from kpi_tracker import KPITracker
+from performance_validator import PerformanceValidator
+from inventory_control import InventoryController
 
 mm_config = MMConfig()
 
@@ -605,4 +605,3 @@ if __name__ == "__main__":
     # Run the validation
     results = asyncio.run(run_v1_alpha_validation())
     print("\n✅ V1-α validation completed!")
-

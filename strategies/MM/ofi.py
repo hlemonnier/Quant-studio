@@ -15,7 +15,7 @@ from typing import Deque, Tuple
 from time import time
 import numpy as np
 import math
-from .config import mm_config
+from config import mm_config
 
 Trade = Tuple[float, float]  # (timestamp, signed_qty)  qty>0 buy, qty<0 sell
 
