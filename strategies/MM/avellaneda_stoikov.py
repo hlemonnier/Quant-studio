@@ -31,11 +31,14 @@ class AvellanedaStoikovQuoter:
         self.symbol = symbol
         self.logger = logging.getLogger(f"AS-{symbol}")
         
-        # Paramètres du modèle (depuis config)
-        self.gamma = mm_config.gamma  # Risk aversion
+        # Paramètres du modèle (spécifiques au symbole si disponibles)
+        symbol_params = mm_config.get_symbol_params(symbol)
+        self.gamma = symbol_params['gamma']  # Risk aversion
+        self.T = symbol_params['T']  # Time horizon
+        self.k = symbol_params['k']  # Market impact parameter
+
+        # Estimation de la volatilité partagée (toujours globale)
         self.sigma = mm_config.sigma  # Volatility estimate
-        self.T = mm_config.T  # Time horizon
-        self.k = mm_config.k  # Market impact parameter
         
         # Historique pour estimation de volatilité
         self.price_history = []

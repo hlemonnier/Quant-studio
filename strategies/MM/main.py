@@ -230,9 +230,14 @@ def main():
     
     print()
     
-    # Route to appropriate mode
+    # Si on n'est pas déjà en mode calibration, on exécute une calibration rapide au démarrage
+    if args.mode != 'calibration':
+        print("\n🛠  Auto-calibration avant lancement du mode", args.mode)
+        # Calibrer pour tous les symboles configurés afin que les autres soient prêts
+        run_calibration_mode(mm_config.symbols)
+
     if args.mode == 'paper-trading':
-        asyncio.run(run_paper_trading(symbols, args.duration))
+        asyncio.run(run_paper_trading(symbols, duration_hours=args.duration))
     elif args.mode == 'backtest':
         run_backtest_mode()
     elif args.mode == 'calibration':

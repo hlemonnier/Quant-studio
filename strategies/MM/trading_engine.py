@@ -242,13 +242,7 @@ class TradingEngine:
             )
         
         # 3. Latency checks (§3.2 V1-α)
-        # 3a. Mid-price latency ≤50ms
-        if hasattr(self, 'last_mid_price_latency_ms'):
-            if self.last_mid_price_latency_ms > mm_config.max_mid_price_latency_ms:
-                return True, (
-                    f"Mid-price latency: {self.last_mid_price_latency_ms:.1f}ms "
-                    f"> {mm_config.max_mid_price_latency_ms}ms"
-                )
+        # Mid-price latency check retiré suite à la directive produit
         
         # 3b. Quote latency ≤300ms (kill-switch)
         avg_latency = self.kpi_tracker.get_average_latency('quote_ack')

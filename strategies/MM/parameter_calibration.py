@@ -272,8 +272,30 @@ class ParameterCalibrator:
         try:
             file_path = repo_root / 'parameters' / filename
             file_path.parent.mkdir(parents=True, exist_ok=True)
+
+            # Charger l'éventuel fichier existant pour merger
+            data = {}
+            if file_path.exists():
+                with open(file_path, 'r') as f:
+                    try:
+                        data = json.load(f)
+                    except json.JSONDecodeError:
+                        self.logger.warning("Calibrated file malformé — réinitialisation")
+
+            # Mettre à jour/ajouter la section du symbole
+            data[self.symbol] = params
+
+            # Mise à jour in-memory pour la session courante
+            try:
+                from .config import mm_config as _cfg
+                if hasattr(_cfg, 'symbol_params'):
+                    _cfg.symbol_params[self.symbol] = params
+            except Exception:
+                pass
+
             with open(file_path, 'w') as f:
-                json.dump(params, f, indent=4)
+                json.dump(data, f, indent=4)
+
             self.logger.info(f"📁 Calibrated parameters saved to {file_path}")
         except Exception as e:
             self.logger.error(f"Failed to save calibrated parameters: {e}")

@@ -90,21 +90,31 @@ class MMConfig:
         self.backtest_commission = 0.001  # Commission 0.1%
 
         # --------------------------------------------------------------
-        # Chargement éventuel de paramètres calibrés (persistants)
+        # Chargement éventuel des paramètres calibrés par symbole
         # --------------------------------------------------------------
+        self.symbol_params: Dict[str, Dict[str, Any]] = {}
         calib_path = pathlib.Path(__file__).resolve().parents[2] / 'parameters' / 'calibrated_mm.json'
         if calib_path.exists():
             try:
                 with open(calib_path, 'r') as f:
-                    calib = json.load(f)
-                # Remplace uniquement les valeurs présentes dans le fichier
-                self.gamma = calib.get('gamma', self.gamma)
-                self.k = calib.get('k', self.k)
-                self.T = calib.get('T', self.T)
-                print(f"ℹ️  Paramètres calibrés chargés depuis {calib_path}")
+                    self.symbol_params = json.load(f)
+                print(f"ℹ️  Paramètres calibrés chargés pour {len(self.symbol_params)} symbole(s) depuis {calib_path}")
             except Exception as e:
                 print(f"⚠️  Impossible de charger les paramètres calibrés: {e}")
-        
+                self.symbol_params = {}
+
+    # ------------------------------------------------------------------
+    # Helpers pour récupérer les paramètres spécifiques à un symbole
+    # ------------------------------------------------------------------
+    def get_symbol_params(self, symbol: str) -> Dict[str, Any]:
+        """Retourne un dict {gamma, k, T} pour le symbole (avec fallback défaut)"""
+        params = self.symbol_params.get(symbol, {})
+        return {
+            'gamma': params.get('gamma', self.gamma),
+            'k': params.get('k', self.k),
+            'T': params.get('T', self.T)
+        }
+    
     def validate_config(self, require_api_keys: bool = False) -> bool:
         """Valide la configuration
         
