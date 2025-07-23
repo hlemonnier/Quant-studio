@@ -1,0 +1,41 @@
+2025-07-23 14:48:10,466 - ParamCalibrator-BTCUSDT - INFO - 🚀 Starting full parameter calibration for BTCUSDT
+2025-07-23 14:48:10,466 - ParamCalibrator-BTCUSDT - INFO - 🔧 Calibrating market impact parameter k...
+2025-07-23 14:48:10,470 - ParamCalibrator-BTCUSDT - INFO - ✅ k calibrated: 0.417 (R²=0.722)
+2025-07-23 14:48:10,470 - ParamCalibrator-BTCUSDT - INFO - 🔧 Calibrating risk aversion parameter γ...
+2025-07-23 14:48:10,471 - ParamCalibrator-BTCUSDT - INFO - ✅ γ calibrated: 0.10000
+2025-07-23 14:48:10,472 - ParamCalibrator-BTCUSDT - INFO -    Best Sharpe: -773.378
+2025-07-23 14:48:10,472 - ParamCalibrator-BTCUSDT - INFO -    RMS Inventory: 0.0011
+2025-07-23 14:48:10,472 - ParamCalibrator-BTCUSDT - INFO - 🔧 Calibrating time horizon T...
+2025-07-23 14:48:10,472 - ParamCalibrator-BTCUSDT - INFO - ✅ T calibrated: 0.019943 (1723s)
+2025-07-23 14:48:10,472 - ParamCalibrator-BTCUSDT - INFO - Applied k = 0.41704418843233343
+2025-07-23 14:48:10,472 - ParamCalibrator-BTCUSDT - INFO - Applied gamma = 0.1
+2025-07-23 14:48:10,472 - ParamCalibrator-BTCUSDT - INFO - Applied T = 0.01994275905436808
+2025-07-23 14:48:10,472 - ParamCalibrator-BTCUSDT - INFO - ✅ Full calibration completed
+2025-07-23 14:58:44,562 - ParamCalibrator-BTCUSDT - INFO - 🚀 Starting full parameter calibration for BTCUSDT
+2025-07-23 14:58:44,562 - ParamCalibrator-BTCUSDT - INFO - 🔧 Calibrating market impact parameter k...
+2025-07-23 14:58:44,565 - ParamCalibrator-BTCUSDT - INFO - ✅ k calibrated: 0.387 (R²=0.910)
+2025-07-23 14:58:44,565 - ParamCalibrator-BTCUSDT - INFO - 🔧 Calibrating risk aversion parameter γ...
+2025-07-23 14:58:44,566 - ParamCalibrator-BTCUSDT - INFO - ✅ γ calibrated: 0.00001
+2025-07-23 14:58:44,566 - ParamCalibrator-BTCUSDT - INFO -    Best Sharpe: 1928.349
+2025-07-23 14:58:44,566 - ParamCalibrator-BTCUSDT - INFO -    RMS Inventory: 0.1373
+2025-07-23 14:58:44,567 - ParamCalibrator-BTCUSDT - INFO - 🔧 Calibrating time horizon T...
+2025-07-23 14:58:44,567 - ParamCalibrator-BTCUSDT - INFO - ✅ T calibrated: 0.000694 (60s)
+2025-07-23 14:58:44,567 - ParamCalibrator-BTCUSDT - INFO - Applied k = 0.3866637886900275
+2025-07-23 14:58:44,567 - ParamCalibrator-BTCUSDT - INFO - Applied gamma = 1e-05
+2025-07-23 14:58:44,567 - ParamCalibrator-BTCUSDT - INFO - Applied T = 0.0006944444444444445
+2025-07-23 14:58:44,567 - ParamCalibrator-BTCUSDT - INFO - 📁 Calibrated parameters saved to /home/hlemonnier/Bureau/Coding/Quant-studio/parameters/calibrated_mm.json
+2025-07-23 14:58:44,567 - ParamCalibrator-BTCUSDT - INFO - ✅ Full calibration completed
+2025-07-23 14:58:44,568 - ParamCalibrator-ETHUSDT - INFO - 🚀 Starting full parameter calibration for ETHUSDT
+2025-07-23 14:58:44,568 - ParamCalibrator-ETHUSDT - INFO - 🔧 Calibrating market impact parameter k...
+2025-07-23 14:58:44,569 - ParamCalibrator-ETHUSDT - INFO - ✅ k calibrated: 0.445 (R²=0.787)
+2025-07-23 14:58:44,569 - ParamCalibrator-ETHUSDT - INFO - 🔧 Calibrating risk aversion parameter γ...
+2025-07-23 14:58:44,570 - ParamCalibrator-ETHUSDT - INFO - ✅ γ calibrated: 0.00001
+2025-07-23 14:58:44,570 - ParamCalibrator-ETHUSDT - INFO -    Best Sharpe: 2740.072
+2025-07-23 14:58:44,570 - ParamCalibrator-ETHUSDT - INFO -    RMS Inventory: 0.3184
+2025-07-23 14:58:44,570 - ParamCalibrator-ETHUSDT - INFO - 🔧 Calibrating time horizon T...
+2025-07-23 14:58:44,570 - ParamCalibrator-ETHUSDT - INFO - ✅ T calibrated: 0.000694 (60s)
+2025-07-23 14:58:44,570 - ParamCalibrator-ETHUSDT - INFO - Applied k = 0.444639017215929
+2025-07-23 14:58:44,570 - ParamCalibrator-ETHUSDT - INFO - Applied gamma = 1e-05
+2025-07-23 14:58:44,570 - ParamCalibrator-ETHUSDT - INFO - Applied T = 0.0006944444444444445
+2025-07-23 14:58:44,574 - ParamCalibrator-ETHUSDT - INFO - 📁 Calibrated parameters saved to /home/hlemonnier/Bureau/Coding/Quant-studio/parameters/calibrated_mm.json
+2025-07-23 14:58:44,574 - ParamCalibrator-ETHUSDT - INFO - ✅ Full calibration completed

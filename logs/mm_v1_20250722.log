@@ -796,3 +796,87 @@
 2025-07-22 17:41:11,546 - TradingEngine-BTCUSDT - INFO - ✅ Trading engine stopped
 2025-07-22 17:41:11,546 - TradingEngine-ETHUSDT - INFO - 🛑 Stopping trading engine...
 2025-07-22 17:41:12,047 - TradingEngine-ETHUSDT - INFO - ✅ Trading engine stopped
+2025-07-22 17:45:31,121 - TradingEngine-BTCUSDT - INFO - 🚀 Starting trading loop for BTCUSDT
+2025-07-22 17:45:31,392 - LocalBook-BTCUSDT - INFO - ✅ Snapshot récupéré: 1000 bids, 1000 asks, updateId=73285387440
+2025-07-22 17:45:31,392 - TradingEngine-BTCUSDT - INFO - ✅ Initialized: Mid=$118850.68
+2025-07-22 17:45:31,392 - TradingEngine-BTCUSDT - INFO - 🔄 Starting main trading loop
+2025-07-22 17:45:31,393 - TradingEngine-ETHUSDT - INFO - 🚀 Starting trading loop for ETHUSDT
+2025-07-22 17:45:31,649 - LocalBook-ETHUSDT - INFO - ✅ Snapshot récupéré: 1000 bids, 1000 asks, updateId=55851544080
+2025-07-22 17:45:31,649 - TradingEngine-ETHUSDT - INFO - ✅ Initialized: Mid=$3709.60
+2025-07-22 17:45:31,649 - TradingEngine-ETHUSDT - INFO - 🔄 Starting main trading loop
+2025-07-22 17:45:32,555 - TradingEngine-ETHUSDT - INFO - 🔴 FILL: ASK 0.0099 @ $3711.08 | Inventory: -0.0099
+2025-07-22 17:45:34,870 - TradingEngine-ETHUSDT - INFO - 🟢 FILL: BID 0.0066 @ $3708.47 | Inventory: -0.0033
+2025-07-22 17:45:36,382 - TradingEngine-BTCUSDT - INFO - 🔴 FILL: ASK 0.0035 @ $118957.92 | Inventory: -0.0035
+2025-07-22 17:45:36,483 - TradingEngine-BTCUSDT - INFO - 🔴 FILL: ASK 0.0054 @ $118947.82 | Inventory: -0.0089
+2025-07-22 17:45:36,583 - TradingEngine-BTCUSDT - INFO - 🟢 FILL: BID 0.0085 @ $118969.60 | Inventory: -0.0003
+2025-07-22 17:45:36,986 - TradingEngine-ETHUSDT - INFO - 🔴 FILL: ASK 0.0039 @ $3709.26 | Inventory: -0.0072
+2025-07-22 17:45:37,087 - TradingEngine-ETHUSDT - INFO - 🟢 FILL: BID 0.0057 @ $3708.48 | Inventory: -0.0015
+2025-07-22 17:45:37,893 - TradingEngine-ETHUSDT - INFO - 🔴 FILL: ASK 0.0024 @ $3708.74 | Inventory: -0.0038
+2025-07-22 17:45:38,800 - TradingEngine-BTCUSDT - INFO - 🟢 FILL: BID 0.0029 @ $118967.53 | Inventory: +0.0026
+2025-07-22 17:45:39,002 - TradingEngine-ETHUSDT - INFO - 🔴 FILL: ASK 0.0069 @ $3709.23 | Inventory: -0.0108
+2025-07-22 17:45:42,731 - TradingEngine-ETHUSDT - INFO - 🔴 FILL: ASK 0.0058 @ $3707.38 | Inventory: -0.0166
+2025-07-22 17:45:45,149 - TradingEngine-ETHUSDT - INFO - 🟢 FILL: BID 0.0046 @ $3707.73 | Inventory: -0.0119
+2025-07-22 17:45:46,964 - TradingEngine-BTCUSDT - INFO - 🟢 FILL: BID 0.0044 @ $118917.15 | Inventory: +0.0070
+2025-07-22 17:45:50,090 - TradingEngine-ETHUSDT - INFO - 🟢 FILL: BID 0.0099 @ $3704.97 | Inventory: -0.0021
+2025-07-22 17:45:50,493 - TradingEngine-BTCUSDT - INFO - 🟢 FILL: BID 0.0075 @ $118912.61 | Inventory: +0.0145
+2025-07-22 17:45:50,594 - TradingEngine-ETHUSDT - INFO - 🟢 FILL: BID 0.0082 @ $3703.70 | Inventory: +0.0061
+2025-07-22 17:45:52,005 - TradingEngine-ETHUSDT - INFO - 🔴 FILL: ASK 0.0063 @ $3703.83 | Inventory: -0.0002
+2025-07-22 17:45:52,813 - TradingEngine-BTCUSDT - INFO - 🟢 FILL: BID 0.0032 @ $118941.84 | Inventory: +0.0177
+2025-07-22 17:45:54,224 - TradingEngine-ETHUSDT - INFO - 🔴 FILL: ASK 0.0017 @ $3704.93 | Inventory: -0.0019
+2025-07-22 17:45:54,325 - TradingEngine-BTCUSDT - INFO - 🟢 FILL: BID 0.0025 @ $119042.20 | Inventory: +0.0201
+2025-07-22 17:45:54,627 - TradingEngine-BTCUSDT - INFO - 🟢 FILL: BID 0.0045 @ $119062.13 | Inventory: +0.0246
+2025-07-22 17:45:55,837 - TradingEngine-ETHUSDT - INFO - 🔴 FILL: ASK 0.0022 @ $3703.59 | Inventory: -0.0041
+2025-07-22 17:45:56,140 - TradingEngine-BTCUSDT - INFO - 🔴 FILL: ASK 0.0072 @ $119072.70 | Inventory: +0.0174
+2025-07-22 17:45:57,753 - TradingEngine-BTCUSDT - INFO - 🔴 FILL: ASK 0.0015 @ $119068.54 | Inventory: +0.0159
+2025-07-22 17:45:57,854 - TradingEngine-ETHUSDT - INFO - 🟢 FILL: BID 0.0038 @ $3705.64 | Inventory: -0.0003
+2025-07-22 17:45:58,156 - TradingEngine-BTCUSDT - INFO - 🟢 FILL: BID 0.0034 @ $119045.12 | Inventory: +0.0193
+2025-07-22 17:45:59,970 - TradingEngine-BTCUSDT - INFO - 🔴 FILL: ASK 0.0011 @ $119012.12 | Inventory: +0.0182
+2025-07-22 17:46:00,474 - TradingEngine-ETHUSDT - INFO - 🟢 FILL: BID 0.0073 @ $3704.96 | Inventory: +0.0070
+2025-07-22 17:46:01,382 - TradingEngine-ETHUSDT - INFO - 🟢 FILL: BID 0.0070 @ $3705.18 | Inventory: +0.0140
+2025-07-22 17:46:01,886 - TradingEngine-ETHUSDT - INFO - 🟢 FILL: BID 0.0054 @ $3704.33 | Inventory: +0.0194
+2025-07-22 17:46:04,506 - TradingEngine-BTCUSDT - INFO - 🔴 FILL: ASK 0.0028 @ $119018.48 | Inventory: +0.0154
+2025-07-22 17:46:07,830 - TradingEngine-ETHUSDT - INFO - 🔴 FILL: ASK 0.0022 @ $3708.75 | Inventory: +0.0172
+2025-07-22 17:46:09,542 - TradingEngine-BTCUSDT - INFO - 🟢 FILL: BID 0.0029 @ $119020.68 | Inventory: +0.0183
+2025-07-22 17:46:10,448 - TradingEngine-BTCUSDT - INFO - 🟢 FILL: BID 0.0021 @ $119100.94 | Inventory: +0.0204
+2025-07-22 17:46:17,002 - TradingEngine-BTCUSDT - INFO - 🔴 FILL: ASK 0.0055 @ $119008.01 | Inventory: +0.0150
+2025-07-22 17:46:18,010 - TradingEngine-BTCUSDT - INFO - 🔴 FILL: ASK 0.0044 @ $118970.68 | Inventory: +0.0106
+2025-07-22 17:46:18,212 - TradingEngine-BTCUSDT - INFO - 🔴 FILL: ASK 0.0017 @ $118976.77 | Inventory: +0.0089
+2025-07-22 17:46:19,725 - TradingEngine-BTCUSDT - INFO - 🟢 FILL: BID 0.0026 @ $118955.08 | Inventory: +0.0115
+2025-07-22 17:46:20,128 - TradingEngine-ETHUSDT - INFO - 🔴 FILL: ASK 0.0075 @ $3712.04 | Inventory: +0.0097
+2025-07-22 17:46:21,037 - TradingEngine-ETHUSDT - INFO - 🔴 FILL: ASK 0.0024 @ $3711.59 | Inventory: +0.0073
+2025-07-22 17:46:22,247 - TradingEngine-ETHUSDT - INFO - 🟢 FILL: BID 0.0027 @ $3709.76 | Inventory: +0.0100
+2025-07-22 17:46:24,669 - TradingEngine-BTCUSDT - INFO - 🔴 FILL: ASK 0.0090 @ $118970.44 | Inventory: +0.0025
+2025-07-22 17:46:25,375 - TradingEngine-BTCUSDT - INFO - 🔴 FILL: ASK 0.0020 @ $118967.15 | Inventory: +0.0006
+2025-07-22 17:46:25,779 - TradingEngine-ETHUSDT - INFO - 🟢 FILL: BID 0.0066 @ $3712.12 | Inventory: +0.0166
+2025-07-22 17:46:25,779 - TradingEngine-BTCUSDT - INFO - 🟢 FILL: BID 0.0073 @ $118964.46 | Inventory: +0.0079
+2025-07-22 17:46:27,091 - TradingEngine-BTCUSDT - INFO - 🔴 FILL: ASK 0.0086 @ $119019.56 | Inventory: -0.0007
+2025-07-22 17:46:27,293 - TradingEngine-ETHUSDT - INFO - 🔴 FILL: ASK 0.0057 @ $3712.04 | Inventory: +0.0109
+2025-07-22 17:46:27,496 - TradingEngine-BTCUSDT - INFO - 🔴 FILL: ASK 0.0097 @ $119004.66 | Inventory: -0.0104
+2025-07-22 17:46:30,825 - TradingEngine-ETHUSDT - INFO - 🔴 FILL: ASK 0.0052 @ $3712.58 | Inventory: +0.0057
+2025-07-22 17:46:33,044 - TradingEngine-BTCUSDT - INFO - 🔴 FILL: ASK 0.0070 @ $118759.05 | Inventory: -0.0174
+2025-07-22 17:46:34,858 - TradingEngine-ETHUSDT - INFO - 🟢 FILL: BID 0.0036 @ $3712.43 | Inventory: +0.0093
+2025-07-22 17:46:36,067 - TradingEngine-ETHUSDT - INFO - 🔴 FILL: ASK 0.0090 @ $3710.68 | Inventory: +0.0003
+2025-07-22 17:46:36,168 - TradingEngine-BTCUSDT - INFO - 🔴 FILL: ASK 0.0024 @ $118634.60 | Inventory: -0.0198
+2025-07-22 17:46:37,581 - TradingEngine-ETHUSDT - INFO - 🔴 FILL: ASK 0.0081 @ $3709.34 | Inventory: -0.0078
+2025-07-22 17:46:37,783 - TradingEngine-BTCUSDT - INFO - 🟢 FILL: BID 0.0011 @ $118666.01 | Inventory: -0.0187
+2025-07-22 17:46:39,902 - TradingEngine-BTCUSDT - INFO - 🔴 FILL: ASK 0.0044 @ $118589.68 | Inventory: -0.0231
+2025-07-22 17:46:40,608 - TradingEngine-ETHUSDT - INFO - 🔴 FILL: ASK 0.0093 @ $3710.61 | Inventory: -0.0171
+2025-07-22 17:46:41,617 - TradingEngine-BTCUSDT - INFO - 🟢 FILL: BID 0.0070 @ $118656.31 | Inventory: -0.0161
+2025-07-22 17:46:42,323 - TradingEngine-ETHUSDT - INFO - 🔴 FILL: ASK 0.0099 @ $3710.82 | Inventory: -0.0270
+2025-07-22 17:46:42,324 - TradingEngine-BTCUSDT - INFO - 🟢 FILL: BID 0.0025 @ $118612.55 | Inventory: -0.0136
+2025-07-22 17:46:42,728 - TradingEngine-BTCUSDT - INFO - 🔴 FILL: ASK 0.0090 @ $118593.77 | Inventory: -0.0226
+2025-07-22 17:46:43,635 - TradingEngine-BTCUSDT - INFO - 🟢 FILL: BID 0.0076 @ $118576.59 | Inventory: -0.0149
+2025-07-22 17:46:44,039 - TradingEngine-BTCUSDT - INFO - 🔴 FILL: ASK 0.0075 @ $118523.64 | Inventory: -0.0225
+2025-07-22 17:46:44,947 - TradingEngine-BTCUSDT - INFO - 🔴 FILL: ASK 0.0018 @ $118531.44 | Inventory: -0.0242
+2025-07-22 17:46:45,753 - TradingEngine-BTCUSDT - INFO - 🟢 FILL: BID 0.0050 @ $118532.18 | Inventory: -0.0192
+2025-07-22 17:46:48,578 - TradingEngine-ETHUSDT - INFO - 🔴 FILL: ASK 0.0077 @ $3706.00 | Inventory: -0.0347
+2025-07-22 17:46:48,882 - TradingEngine-BTCUSDT - INFO - 🔴 FILL: ASK 0.0087 @ $118523.62 | Inventory: -0.0279
+2025-07-22 17:46:49,689 - TradingEngine-BTCUSDT - INFO - 🟢 FILL: BID 0.0032 @ $118500.71 | Inventory: -0.0246
+2025-07-22 17:46:52,420 - TradingEngine-BTCUSDT - INFO - Trading loop cancelled
+2025-07-22 17:46:52,420 - TradingEngine-BTCUSDT - INFO - Trading loop stopped
+2025-07-22 17:46:52,420 - TradingEngine-ETHUSDT - INFO - Trading loop cancelled
+2025-07-22 17:46:52,421 - TradingEngine-ETHUSDT - INFO - Trading loop stopped
+2025-07-22 17:46:52,421 - TradingEngine-BTCUSDT - INFO - 🛑 Stopping trading engine...
+2025-07-22 17:46:52,922 - TradingEngine-BTCUSDT - INFO - ✅ Trading engine stopped
+2025-07-22 17:46:52,923 - TradingEngine-ETHUSDT - INFO - 🛑 Stopping trading engine...
+2025-07-22 17:46:53,424 - TradingEngine-ETHUSDT - INFO - ✅ Trading engine stopped

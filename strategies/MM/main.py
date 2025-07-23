@@ -145,32 +145,30 @@ def run_backtest_mode():
         print(f"❌ Backtesting failed: {e}")
 
 
-def run_calibration_mode():
-    """Run parameter calibration mode"""
+def run_calibration_mode(symbols: List[str]):
+    """Run parameter calibration mode for one or several symbols"""
     print("🔧 Starting Parameter Calibration")
     print("=" * 60)
-    
-    try:
-        calibrator = ParameterCalibrator('BTCUSDT')
-        
-        # Generate synthetic data for demo
-        print("📊 Generating synthetic calibration data...")
-        market_data, trading_history = generate_synthetic_calibration_data()
-        
-        # Run calibration
-        results = calibrator.run_full_calibration(market_data, trading_history)
-        
-        print("\n🎯 Calibration Results:")
-        print("=" * 40)
-        for param, value in results.items():
-            print(f"  {param}: {value:.6f}")
-        print("=" * 40)
-        
-        print("✅ Parameters updated in mm_config")
-        print("💡 You can now run paper trading with optimized parameters")
-        
-    except Exception as e:
-        print(f"❌ Calibration failed: {e}")
+
+    for sym in symbols:
+        print(f"\n📈 Calibrating parameters for {sym} ...")
+        try:
+            calibrator = ParameterCalibrator(sym)
+
+            # TODO: Replace synthetic generator by real historical data loading
+            market_data, trading_history = generate_synthetic_calibration_data()
+
+            results = calibrator.run_full_calibration(market_data, trading_history)
+
+            print("\n🎯 Calibration Results for", sym)
+            print("=" * 40)
+            for param, value in results.items():
+                print(f"  {param}: {value:.6f}")
+            print("=" * 40)
+            print("✅ Parameters updated and saved for", sym)
+
+        except Exception as e:
+            print(f"❌ Calibration failed for {sym}: {e}")
 
 
 async def run_live_trading(symbols: List[str]):
@@ -238,7 +236,7 @@ def main():
     elif args.mode == 'backtest':
         run_backtest_mode()
     elif args.mode == 'calibration':
-        run_calibration_mode()
+        run_calibration_mode(symbols)
     elif args.mode == 'live':
         asyncio.run(run_live_trading(symbols))
 

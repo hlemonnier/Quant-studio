@@ -11,6 +11,7 @@ This addresses the missing calibration algorithms from §3.4.
 
 import sys
 import pathlib
+import json
 import numpy as np
 import pandas as pd
 from scipy import stats
@@ -259,9 +260,23 @@ class ParameterCalibrator:
         
         # 4. Apply calibrated parameters to config
         self._apply_calibrated_parameters(calibrated_params)
+
+        # 5. Persist calibrated parameters to disk so that future runs load them
+        self._save_calibrated_parameters(calibrated_params)
         
         self.logger.info("✅ Full calibration completed")
         return calibrated_params
+
+    def _save_calibrated_parameters(self, params: Dict[str, float], filename: str = "calibrated_mm.json"):
+        """Persist calibrated parameters to parameters/calibrated_mm.json"""
+        try:
+            file_path = repo_root / 'parameters' / filename
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(file_path, 'w') as f:
+                json.dump(params, f, indent=4)
+            self.logger.info(f"📁 Calibrated parameters saved to {file_path}")
+        except Exception as e:
+            self.logger.error(f"Failed to save calibrated parameters: {e}")
     
     def _apply_calibrated_parameters(self, params: Dict[str, float]):
         """Apply calibrated parameters to global config"""

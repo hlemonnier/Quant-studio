@@ -3,6 +3,8 @@ Configuration pour le Market Making V1
 """
 
 import os
+import json
+import pathlib
 from typing import List, Dict, Any
 
 class MMConfig:
@@ -86,6 +88,22 @@ class MMConfig:
         # Backtesting
         self.backtest_latency_ms = 0  # Latence 0 pour la V1
         self.backtest_commission = 0.001  # Commission 0.1%
+
+        # --------------------------------------------------------------
+        # Chargement éventuel de paramètres calibrés (persistants)
+        # --------------------------------------------------------------
+        calib_path = pathlib.Path(__file__).resolve().parents[2] / 'parameters' / 'calibrated_mm.json'
+        if calib_path.exists():
+            try:
+                with open(calib_path, 'r') as f:
+                    calib = json.load(f)
+                # Remplace uniquement les valeurs présentes dans le fichier
+                self.gamma = calib.get('gamma', self.gamma)
+                self.k = calib.get('k', self.k)
+                self.T = calib.get('T', self.T)
+                print(f"ℹ️  Paramètres calibrés chargés depuis {calib_path}")
+            except Exception as e:
+                print(f"⚠️  Impossible de charger les paramètres calibrés: {e}")
         
     def validate_config(self, require_api_keys: bool = False) -> bool:
         """Valide la configuration
