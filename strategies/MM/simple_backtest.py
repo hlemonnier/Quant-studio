@@ -253,5 +253,38 @@ async def main():
         import traceback
         traceback.print_exc()
 
+def run_simple_backtest():
+    """Interface compatible avec main.py pour le mode backtest"""
+    try:
+        # Générer des données (30 minutes pour test rapide)
+        market_data = generate_simple_data(duration_minutes=30)
+        
+        # Exécuter le backtest de manière synchrone
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        results = loop.run_until_complete(simple_backtest(market_data))
+        loop.close()
+        
+        # Adapter le format pour main.py
+        kpi = results['performance']['kpi_summary']
+        validation = results['performance']['validation']
+        overall_pass = validation['status'] in ['EXCELLENT', 'GOOD']
+        
+        return {
+            'total_pnl': kpi['total_pnl'],
+            'final_inventory': results['performance']['final_inventory'],
+            'validation': {
+                'overall_pass': overall_pass
+            }
+        }
+        
+    except Exception as e:
+        print(f"❌ Erreur backtest: {e}")
+        return {
+            'total_pnl': 0.0,
+            'final_inventory': 0.0,
+            'validation': {'overall_pass': False}
+        }
+
 if __name__ == "__main__":
     asyncio.run(main())

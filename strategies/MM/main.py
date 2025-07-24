@@ -33,7 +33,7 @@ if str(repo_root) not in sys.path:
 
 from strategies.MM.config import mm_config
 from strategies.MM.trading_engine import TradingEngine
-from strategies.MM.backtesting_v1 import run_full_v1_validation
+from strategies.MM.simple_backtest import run_simple_backtest
 from strategies.MM.parameter_calibration import ParameterCalibrator, generate_synthetic_calibration_data
 
 
@@ -129,7 +129,7 @@ def run_backtest_mode():
     print("=" * 60)
     
     try:
-        results = run_full_v1_validation()
+        results = run_simple_backtest()
         
         print("\n🎯 Backtesting Results:")
         print(f"  Total PnL: ${results['total_pnl']:.2f}")

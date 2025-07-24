@@ -30,7 +30,7 @@ from strategies.MM.config import mm_config
 from strategies.MM.ofi import OFICalculator
 from strategies.MM.trading_engine import TradingEngine
 from strategies.MM.kpi_tracker import KPITracker
-from strategies.MM.backtesting_v1 import BacktestEngine, HistoricalDataGenerator
+# from strategies.MM.backtesting_v1 import BacktestEngine, HistoricalDataGenerator  # Supprimé
 
 
 # =============================================================================
@@ -226,29 +226,10 @@ def test_complete_trading_cycle():
     assert len(engine.active_quotes) == 2  # Should have bid and ask quotes
 
 
-def test_backtesting_pipeline():
-    """Test the backtesting pipeline works end-to-end"""
-    # Generate test data
-    data_gen = HistoricalDataGenerator()
-    test_data = data_gen.generate_realistic_data(
-        symbol='BTCUSDT',
-        start_price=50000.0,
-        duration_hours=1,
-        tick_frequency_ms=100
-    )
-    
-    assert len(test_data) > 0
-    assert 'bid_price' in test_data.columns
-    assert 'ask_price' in test_data.columns
-    
-    # Run backtest
-    backtest_engine = BacktestEngine('BTCUSDT')
-    results = asyncio.run(backtest_engine.run_backtest(test_data, duration_minutes=5))
-    
-    # Verify results structure
-    assert 'kpis' in results
-    assert 'trades' in results
-    assert 'final_inventory' in results
+# def test_backtesting_pipeline():
+#     """Test the backtesting pipeline works end-to-end"""
+#     # SUPPRIMÉ - utilisait les anciens fichiers de backtest
+#     pass
 
 
 def test_stress_conditions():
@@ -339,4 +320,3 @@ if __name__ == "__main__":
     test_performance_benchmarks()
     
     print("\n🎉 All V1 tests passed!")
-
