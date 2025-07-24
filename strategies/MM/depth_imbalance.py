@@ -99,6 +99,14 @@ class DepthImbalanceCalculator:
         snapshot = DepthSnapshot(timestamp, depth_bid_l1_l5, depth_ask_l1_l5)
         self._snapshots.append(snapshot)
         
+        # Debug: Log depth values occasionally
+        if self._n % 50 == 0:  # Every 50 updates
+            self.logger.info(
+                f"DI Depth Debug: bid_depth={depth_bid_l1_l5:.4f}, "
+                f"ask_depth={depth_ask_l1_l5:.4f}, "
+                f"di_raw={snapshot.di_raw:.4f}"
+            )
+        
         # Update current raw DI
         self._current_di_raw = snapshot.di_raw
         
@@ -111,10 +119,13 @@ class DepthImbalanceCalculator:
         # Apply EMA smoothing
         self._current_di_filtered = self._apply_ema_smoothing(self._current_di_normalized)
         
+        # Debug logging with more details
+        std = math.sqrt(self._var / (self._n - 1)) if self._n > 1 else 0.0
         self.logger.debug(
             f"DI Update: raw={self._current_di_raw:.4f}, "
             f"norm={self._current_di_normalized:.4f}, "
-            f"filtered={self._current_di_filtered:.4f}"
+            f"filtered={self._current_di_filtered:.4f}, "
+            f"mean={self._mean:.4f}, std={std:.6f}, n={self._n}"
         )
         
         return self._current_di_filtered
@@ -262,4 +273,3 @@ def test_di_calculator():
 
 if __name__ == "__main__":
     test_di_calculator()
-
