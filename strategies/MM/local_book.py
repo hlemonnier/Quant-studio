@@ -199,6 +199,43 @@ class LocalBook:
         
         return (bid_volume - ask_volume) / total_volume
     
+    def get_depth_l1_l5_bid(self) -> float:
+        """
+        Get aggregated bid depth for L1-L5 levels (V1.5 requirement)
+        
+        Returns:
+            Sum of bid quantities across top 5 levels
+        """
+        if not self.bids:
+            return 0.0
+        
+        # Get top 5 bid levels (highest prices)
+        sorted_bids = sorted(self.bids.items(), key=lambda x: x[0], reverse=True)[:5]
+        return sum(qty for _, qty in sorted_bids)
+    
+    def get_depth_l1_l5_ask(self) -> float:
+        """
+        Get aggregated ask depth for L1-L5 levels (V1.5 requirement)
+        
+        Returns:
+            Sum of ask quantities across top 5 levels
+        """
+        if not self.asks:
+            return 0.0
+        
+        # Get top 5 ask levels (lowest prices)
+        sorted_asks = sorted(self.asks.items(), key=lambda x: x[0])[:5]
+        return sum(qty for _, qty in sorted_asks)
+    
+    def get_depth_l1_l5_both(self) -> Tuple[float, float]:
+        """
+        Get aggregated depth for both bid and ask L1-L5 levels
+        
+        Returns:
+            Tuple of (bid_depth_l1_l5, ask_depth_l1_l5)
+        """
+        return self.get_depth_l1_l5_bid(), self.get_depth_l1_l5_ask()
+    
     def calculate_checksum(self) -> str:
         """Calcule un checksum du book pour validation"""
         # Concaténer les 10 meilleurs niveaux de chaque côté
@@ -321,4 +358,4 @@ if __name__ == "__main__":
         stats = book.get_book_stats()
         print(f"\n📊 Stats: Mid=${stats['mid_price']:.2f}, Spread={stats['spread_bps']:.1f}bps")
     else:
-        print("❌ Erreur snapshot") 
+        print("❌ Erreur snapshot")

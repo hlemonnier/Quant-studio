@@ -73,6 +73,34 @@ class MMConfig:
         # Tick-size par défaut (fallback si lookup symbole indisponible)
         self.default_tick_size = 0.01
 
+        # ------------------------------------------------------------------
+        # V1.5 Enhanced Parameters (§4.6)
+        # ------------------------------------------------------------------
+        # Depth Imbalance (DI) coefficient: DI → ticks
+        self.beta_di = 0.2  # tick/unit (initial value from spec)
+        
+        # Inventory penalty coefficients
+        self.kappa_inv = 0.1  # tick/lot (for both centre and spread)
+        
+        # Volatility sensitivity for dynamic spread
+        self.kappa_vol = 1.2  # multiplier for volatility component
+        
+        # Quote ageing parameters
+        self.quote_ageing_ms = 750  # 750ms timeout as per spec
+        
+        # Enhanced risk controls (§4.7)
+        self.max_offset_ticks = 3  # Global offset clamp ≤ 3 ticks
+        self.min_spread_ticks = 2  # Spread floor ≥ 2 ticks
+        
+        # V1.5 Performance targets (§4.8)
+        self.target_pnl_improvement_pct = 30.0    # +30% PnL/trade vs V1-α
+        self.target_spread_capture_v15_pct = 78.0  # ≥78% spread capture (+8pts)
+        self.target_rms_inventory_v15_ratio = 0.35  # ≤0.35 q_max RMS inventory
+        self.target_hit_ratio_ofi_di_pct = 60.0    # ≥60% hit ratio OFI+DI
+        
+        # Version control
+        self.strategy_version = "V1-α"  # Default version, can be overridden
+
         # Data Storage
         self.data_dir = 'data/mm_data'
         self.parquet_compression = 'snappy'
@@ -107,12 +135,18 @@ class MMConfig:
     # Helpers pour récupérer les paramètres spécifiques à un symbole
     # ------------------------------------------------------------------
     def get_symbol_params(self, symbol: str) -> Dict[str, Any]:
-        """Retourne un dict {gamma, k, T} pour le symbole (avec fallback défaut)"""
+        """Retourne un dict avec tous les paramètres pour le symbole (avec fallback défaut)"""
         params = self.symbol_params.get(symbol, {})
         return {
+            # Base A&S parameters
             'gamma': params.get('gamma', self.gamma),
             'k': params.get('k', self.k),
-            'T': params.get('T', self.T)
+            'T': params.get('T', self.T),
+            
+            # V1.5 parameters
+            'beta_di': params.get('beta_di', self.beta_di),
+            'kappa_inv': params.get('kappa_inv', self.kappa_inv),
+            'kappa_vol': params.get('kappa_vol', self.kappa_vol),
         }
     
     def validate_config(self, require_api_keys: bool = False) -> bool:
