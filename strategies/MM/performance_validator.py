@@ -10,10 +10,8 @@ from typing import Dict, List, Tuple, Optional
 from datetime import datetime, timedelta
 import numpy as np
 
-from config import MMConfig
-from kpi_tracker import KPITracker
-
-mm_config = MMConfig()
+from .config import mm_config
+from .kpi_tracker import KPITracker
 
 
 class PerformanceValidator:

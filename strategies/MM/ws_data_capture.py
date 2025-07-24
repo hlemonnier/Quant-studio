@@ -1,8 +1,10 @@
 """
-WebSocket Data Capture - Étape 1 de la roadmap MM V1
+WebSocket Data Capture - Module standalone pour capture de données
 
-Objectif: Capturer depth20@100ms pour chaque symbole ciblé
-Livrable: micro-service Python, parquet quotidien
+Module indépendant pour capturer les données depth20@100ms de Binance.
+Utilisé pour la collecte de données historiques, pas intégré au trading engine principal.
+
+Usage: python ws_data_capture.py (en tant que script standalone)
 """
 
 import asyncio

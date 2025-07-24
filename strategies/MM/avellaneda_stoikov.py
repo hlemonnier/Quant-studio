@@ -14,8 +14,8 @@ from typing import Tuple, Dict, Optional
 import math
 from datetime import datetime, timedelta
 import logging
-from config import mm_config
-from ofi import OFICalculator   # Helper for users – quoter only consumes OFI value
+from .config import mm_config
+from .ofi import OFICalculator
 
 class AvellanedaStoikovQuoter:
     """
@@ -61,24 +61,20 @@ class AvellanedaStoikovQuoter:
         if len(self.price_history) > self.volatility_window:
             self.price_history = self.price_history[-self.volatility_window:]
         
-        # Recalculer la volatilité dès qu'on a au moins 2 observations (V1-α)
+        # Recalculer la volatilité dès qu'on a au moins 2 observations
         if len(self.price_history) >= 2:
             self._estimate_volatility()
     
     def _estimate_volatility(self):
-        """
-        Estime la volatilité avec EWMA sur exactement 100 observations (§3.2 V1-α)
-        Conforme au cahier des charges : "EWMA 100 observations ajustée every tick"
-        """
+        """Estime la volatilité avec EWMA sur 100 observations"""
         if len(self.price_history) < 2:
             return
         
         prices = [p['price'] for p in self.price_history]
         log_returns = np.diff(np.log(prices))
         
-        # EWMA avec exactement les observations disponibles (max 100)
-        # Facteur de décroissance pour EWMA : α = 2/(N+1) où N=100
-        alpha_ewma = 2.0 / (100 + 1)  # ≈ 0.0198
+        # EWMA avec les observations disponibles (max 100)
+        alpha_ewma = 2.0 / (100 + 1)  # Facteur de décroissance EWMA
         
         if len(log_returns) == 1:
             # Premier return : initialiser avec la variance simple
@@ -95,15 +91,13 @@ class AvellanedaStoikovQuoter:
                 
             ewma_variance /= weights_sum
         
-        # Volatilité annualisée (updates toutes les 100ms selon §3.2)
-        # 1 jour = 86400 secondes = 864000 updates de 100ms
-        periods_per_day = 864000
+        # Volatilité annualisée (updates toutes les 100ms)
+        periods_per_day = 864000  # 1 jour = 86400 secondes = 864000 updates de 100ms
         volatility_daily = np.sqrt(ewma_variance * periods_per_day)
         
-        # Mise à jour directe (pas de lissage supplémentaire car EWMA déjà lissé)
         self.sigma = volatility_daily
         
-        self.logger.debug(f"📊 Volatilité EWMA-100: {self.sigma:.4f} (sur {len(log_returns)} obs)")
+        self.logger.debug(f"📊 Volatilité EWMA: {self.sigma:.4f} (sur {len(log_returns)} obs)")
     
     def compute_reservation_price(self, mid_price: float, inventory: float, 
                                  time_remaining: float = None) -> float:
@@ -134,29 +128,24 @@ class AvellanedaStoikovQuoter:
         time_remaining: float = None
     ) -> float:
         """
-        Calcule le **spread total coté** (2 × δ*) selon la solution fermée
-        d'Avellaneda-Stoikov (§3.3 du cahier des charges) :
-            δ* = (1/γ) · ln(1 + γ/k)      ← demi-spread théorique
-            spread_total = 2 · δ*
+        Calcule le spread optimal selon Avellaneda-Stoikov
         
-        Cette formule **ne dépend pas** de l'inventaire ni du temps restant
-        pour la V1 (horizon maintenu court dans la config). Les anciennes
-        versions dépendantes de σ et (T-t) faisaient parfois tomber le spread
-        à 0 bps, d'où la régression observée.
+        Formule: δ* = (1/γ) · ln(1 + γ/k)
+        Retourne le spread total (2 × δ*)
         """
-        # 1️⃣ Calcule le spread **en dollars** (formule A&S)
-        delta_star = (1 / self.gamma) * math.log(1 + self.gamma / self.k)  # demi-spread $
-        spread_units = 2 * delta_star                                       # spread total $
+        # Calcule le spread en dollars (formule A&S)
+        delta_star = (1 / self.gamma) * math.log(1 + self.gamma / self.k)
+        spread_units = 2 * delta_star
 
-        # 2️⃣ Normalise en fraction du prix pour travailler en bps correctement
-        spread_fraction = spread_units / mid_price                          # ex: 0.0002
-        spread_bps = spread_fraction * 10000                                # ex: 2.0 bps
+        # Normalise en fraction du prix pour travailler en bps
+        spread_fraction = spread_units / mid_price
+        spread_bps = spread_fraction * 10000
 
-        # 3️⃣ Applique limites mini/maxi en **bps**
+        # Applique limites mini/maxi en bps
         spread_bps = max(mm_config.min_spread_bps,
                          min(mm_config.max_spread_bps, spread_bps))
 
-        # 4️⃣ Retourne la fraction finale
+        # Retourne la fraction finale
         return spread_bps / 10000
     
     def compute_quotes(self, mid_price: float, inventory: float,
@@ -180,10 +169,7 @@ class AvellanedaStoikovQuoter:
         else:
             # Recalculer
             reservation_price = self.compute_reservation_price(mid_price, inventory, time_remaining)
-            # ⬇️  Nouvelle signature : le premier argument est désormais mid_price
-            optimal_spread = self.compute_optimal_spread(mid_price,
-                                                         inventory,
-                                                         time_remaining)
+            optimal_spread = self.compute_optimal_spread(mid_price, inventory, time_remaining)
             
             # Mettre en cache
             self._cached_reservation_price = reservation_price
@@ -194,13 +180,11 @@ class AvellanedaStoikovQuoter:
         # Calculer bid et ask
         half_spread = optimal_spread / 2
         
-        # ------------------------------------------------------------------
-        # Centre-shift basé sur l'Order-Flow Imbalance  (§3.3bis)
-        # ------------------------------------------------------------------
+        # Centre-shift basé sur l'Order-Flow Imbalance
         tick_size = mm_config.get_symbol_config(self.symbol).get(
             "tick_size", mm_config.default_tick_size
         )
-        max_shift = tick_size                  # ±1 tick
+        max_shift = tick_size  # ±1 tick
         center_shift = np.clip(mm_config.beta_ofi * ofi * tick_size,
                                -max_shift, max_shift)
 
@@ -210,8 +194,6 @@ class AvellanedaStoikovQuoter:
         ask_price = reservation_price_shifted + half_spread
         
         # Calculer le spread en bps
-        # optimal_spread est déjà une FRACTION (ex: 0.0005 pour 5 bps)
-        # Il suffit donc de multiplier par 10 000 pour obtenir les bps.
         spread_bps = optimal_spread * 10000
         
         quotes = {

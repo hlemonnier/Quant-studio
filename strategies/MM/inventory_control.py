@@ -9,10 +9,7 @@ import numpy as np
 from typing import Dict, Tuple, Optional
 import logging
 from datetime import datetime, timedelta
-try:
-    from .config import mm_config
-except ImportError:
-    from config import mm_config
+from .config import mm_config
 
 class InventoryController:
     """Contrôleur d'inventaire avec skew automatique"""
@@ -34,16 +31,15 @@ class InventoryController:
         self.inventory_history = []
         self.pnl_history = []
         
-        # PnL tracking - CORRIGÉ: utiliser mark-to-market
-        self.total_cash_flow = 0.0  # Cash flow cumulé (coût des trades)
+        # PnL tracking avec mark-to-market
+        self.total_cash_flow = 0.0  # Cash flow cumulé
         self.daily_cash_flow = 0.0  # Cash flow quotidien
-        self.current_mid_price = 0.0  # Prix mid actuel pour mark-to-market
+        self.current_mid_price = 0.0  # Prix mid actuel
         
         # Métriques de risque
         self.max_drawdown = 0.0
         
-        # Capital de base pour les calculs de pourcentage (pour MM)
-        # Estimation du capital alloué à cette stratégie
+        # Capital de base pour les calculs de pourcentage
         self.base_capital = 10000.0  # $10,000 par défaut
         
     def update_inventory(self, trade_quantity: float, trade_price: float, current_mid: float = None):
