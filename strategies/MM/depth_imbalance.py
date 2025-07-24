@@ -145,7 +145,7 @@ class DepthImbalanceCalculator:
         
         # Calculate standard deviation
         std = math.sqrt(self._var / (self._n - 1))
-        if std <= 1e-9:
+        if std <= 1e-12:  # Reduced threshold to capture smaller variations
             return 0.0  # Avoid division by zero
         
         # Calculate Z-score
