@@ -67,7 +67,7 @@ class MMConfig:
         # Coefficient β : nb de ticks de déplacement du centre par unité d’OFI
         self.beta_ofi = 0.30
         # Fenêtre (s) pour le calcul de l’OFI
-        self.ofi_window_seconds = 1.0
+        self.ofi_window_seconds = 5.0  # Increased from 1.0s to capture more fills in crypto
         # Clamp du z-score de l’OFI pour éviter les outliers
         self.ofi_clamp_std = 3.0
         # Tick-size par défaut (fallback si lookup symbole indisponible)

@@ -61,6 +61,12 @@ class OFICalculator:
         """Return the normalised (z-scored & clamped) OFI over the window."""
         now = time()
         self._prune(now)
+        
+        # Debug: Log trade count occasionally
+        if not hasattr(self, '_last_ofi_log') or now - self._last_ofi_log > 10:
+            self._last_ofi_log = now
+            print(f"DEBUG OFI {self.symbol}: {len(self._trades)} trades in {self.window_seconds}s window")
+        
         if not self._trades:
             return 0.0
         volumes = np.fromiter((q for _, q in self._trades), dtype=float)
