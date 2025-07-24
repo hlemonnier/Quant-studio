@@ -156,7 +156,7 @@ class AvellanedaStoikovV15Quoter(AvellanedaStoikovQuoter):
         # Start with base reservation price
         centre = reservation_price
         
-        # Add inventory adjustment (κ_inv·q_t)
+        # Add inventory adjustment (κ_inv·q_t) - scale with tick size for now
         inventory_adj = self.kappa_inv * inventory * self.tick_size
         centre += inventory_adj
         
@@ -180,12 +180,15 @@ class AvellanedaStoikovV15Quoter(AvellanedaStoikovQuoter):
         # Start with base A&S spread
         spread = base_spread
         
-        # Add volatility component (κ_vol·σ_t)
-        vol_component = self.kappa_vol * self.sigma * mid_price
+        # Add volatility component (κ_vol·σ_t) 
+        # σ is annualized volatility, scale it down for short-term spread adjustment
+        # Use a much smaller scaling factor to avoid excessive spreads
+        vol_component = self.kappa_vol * base_spread * self.sigma
         spread += vol_component
         
         # Add inventory component (κ_inv·|q_t|)
-        inv_component = self.kappa_inv * abs(inventory) * self.tick_size
+        # Scale inventory impact relative to base spread rather than fixed tick size
+        inv_component = self.kappa_inv * abs(inventory) * base_spread
         spread += inv_component
         
         return spread
@@ -368,4 +371,3 @@ def test_v15_quoter():
 
 if __name__ == "__main__":
     test_v15_quoter()
-

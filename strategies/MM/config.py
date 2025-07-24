@@ -49,7 +49,7 @@ class MMConfig:
         self.max_order_size = 0.1  # Taille maximum d'ordre
         
         # Risk Management
-        self.max_spread_bps = 200  # Spread maximum en basis points
+        self.max_spread_bps = 500  # Spread maximum en basis points (increased for V1.5)
         self.min_spread_bps = 5  # Spread minimum en basis points (plus réaliste)
         # Stop-loss global (en % du capital) – plus large pour laisser respirer le MM
         self.stop_loss_pct = 50.0
@@ -80,10 +80,10 @@ class MMConfig:
         self.beta_di = 0.2  # tick/unit (initial value from spec)
         
         # Inventory penalty coefficients
-        self.kappa_inv = 0.1  # tick/lot (for both centre and spread)
+        self.kappa_inv = 0.01  # tick/lot (for both centre and spread) - reduced to avoid excessive impact
         
-        # Volatility sensitivity for dynamic spread
-        self.kappa_vol = 1.2  # multiplier for volatility component
+        # Volatility sensitivity for dynamic spread (reduced from 1.2 to avoid excessive spreads)
+        self.kappa_vol = 0.2  # multiplier for volatility component (scaled for base spread)
         
         # Quote ageing parameters
         self.quote_ageing_ms = 750  # 750ms timeout as per spec
