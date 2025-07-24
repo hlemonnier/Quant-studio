@@ -234,7 +234,21 @@ class LocalBook:
         Returns:
             Tuple of (bid_depth_l1_l5, ask_depth_l1_l5)
         """
-        return self.get_depth_l1_l5_bid(), self.get_depth_l1_l5_ask()
+        bid_depth = self.get_depth_l1_l5_bid()
+        ask_depth = self.get_depth_l1_l5_ask()
+        
+        # Debug: Log occasionally to check if values change
+        import time
+        if not hasattr(self, '_last_depth_log') or time.time() - self._last_depth_log > 10:
+            self._last_depth_log = time.time()
+            # Show top 3 levels for debugging
+            top_bids = sorted(self.bids.items(), key=lambda x: x[0], reverse=True)[:3]
+            top_asks = sorted(self.asks.items(), key=lambda x: x[0])[:3]
+            print(f"DEBUG LocalBook {self.symbol}: bid_depth={bid_depth:.4f}, ask_depth={ask_depth:.4f}")
+            print(f"  Top bids: {top_bids}")
+            print(f"  Top asks: {top_asks}")
+        
+        return bid_depth, ask_depth
     
     def calculate_checksum(self) -> str:
         """Calcule un checksum du book pour validation"""
