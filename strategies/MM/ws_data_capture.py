@@ -1,8 +1,10 @@
 """
-WebSocket Data Capture - Étape 1 de la roadmap MM V1
+WebSocket Data Capture - Module standalone pour capture de données
 
-Objectif: Capturer depth20@100ms pour chaque symbole ciblé
-Livrable: micro-service Python, parquet quotidien
+Module indépendant pour capturer les données depth20@100ms de Binance.
+Utilisé pour la collecte de données historiques, pas intégré au trading engine principal.
+
+Usage: python ws_data_capture.py (en tant que script standalone)
 """
 
 import asyncio
@@ -96,13 +98,17 @@ class BinanceWSCapture:
         if not depth_data.get('bids') or not depth_data.get('asks'):
             return {'symbol': symbol, 'timestamp': datetime.now(timezone.utc), 'bids': [], 'asks': []}
         
+        # Timestamp de réception pour mesurer la latence (§3.2 V1-α)
+        reception_timestamp = datetime.now(timezone.utc)
+        
         processed = {
-            'timestamp': datetime.now(timezone.utc),
+            'timestamp': reception_timestamp,
             'symbol': symbol,
             'last_update_id': depth_data.get('lastUpdateId', 0),
             'bids': [[float(bid[0]), float(bid[1])] for bid in depth_data.get('bids', [])],
             'asks': [[float(ask[0]), float(ask[1])] for ask in depth_data.get('asks', [])],
-            'event_time': depth_data.get('E', 0),  # Event time
+            'event_time': depth_data.get('E', 0),  # Event time from exchange
+            'reception_time_ms': reception_timestamp.timestamp() * 1000,  # Pour calcul latence
         }
         
         return processed
@@ -151,10 +157,16 @@ class BinanceWSCapture:
         mid_price = (best_bid + best_ask) / 2
         spread = best_ask - best_bid
         
+        # Calcul de la latence mid-price (§3.2 V1-α : ≤50ms)
+        event_time_ms = processed_data.get('event_time', 0)
+        reception_time_ms = processed_data.get('reception_time_ms', 0)
+        mid_price_latency_ms = reception_time_ms - event_time_ms if event_time_ms > 0 else 0
+        
         metrics = {
             'mid_price': mid_price,
             'spread': spread,
             'spread_bps': (spread / mid_price) * 10000 if mid_price > 0 else 0,
+            'mid_price_latency_ms': mid_price_latency_ms,  # Latence mid-price
             'bid_volume_5': sum(bids_array[:5, 1]) if len(bids_array) >= 5 else sum(bids_array[:, 1]),
             'ask_volume_5': sum(asks_array[:5, 1]) if len(asks_array) >= 5 else sum(asks_array[:, 1]),
             'bid_volume_total': sum(bids_array[:, 1]),
@@ -301,4 +313,4 @@ async def test_connection():
 
 if __name__ == "__main__":
     # Test direct du module
-    asyncio.run(test_connection()) 
+    asyncio.run(test_connection())

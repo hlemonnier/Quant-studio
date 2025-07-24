@@ -23,7 +23,7 @@ sys.path.insert(0, project_root)
 from parameters.config_file import Config
 from backtesting.backtrader_observers import OrderObserver
 from strategies.strategies_model.strategy_crossover_long_short import CrossOver_LongShort
-from strategies.strategy_buy_and_hold import BuyAndHold
+from strategies.strategies_model.strategy_buy_and_hold import BuyAndHold
 from strategies.strategies_model.strategy_long_short import LongShort
 from strategies.strategy_long_short_grid import LongShortGrid
 from strategies.strategies_model.strategy_grid_trading import Grid

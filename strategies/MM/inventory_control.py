@@ -31,19 +31,30 @@ class InventoryController:
         self.inventory_history = []
         self.pnl_history = []
         
+        # PnL tracking avec mark-to-market
+        self.total_cash_flow = 0.0  # Cash flow cumulé
+        self.daily_cash_flow = 0.0  # Cash flow quotidien
+        self.current_mid_price = 0.0  # Prix mid actuel
+        
         # Métriques de risque
         self.max_drawdown = 0.0
-        self.daily_pnl = 0.0
-        self.total_pnl = 0.0
         
-    def update_inventory(self, trade_quantity: float, trade_price: float):
+        # Capital de base pour les calculs de pourcentage
+        self.base_capital = 10000.0  # $10,000 par défaut
+        
+    def update_inventory(self, trade_quantity: float, trade_price: float, current_mid: float = None):
         """Met à jour l'inventaire après un trade"""
         # Mettre à jour l'inventaire
         self.current_inventory += trade_quantity
         
-        # Calculer le PnL (simplifié)
-        pnl_change = -trade_quantity * trade_price  # Coût du trade
-        self.total_pnl += pnl_change
+        # Mettre à jour le prix mid actuel si fourni
+        if current_mid is not None:
+            self.current_mid_price = current_mid
+        
+        # Calculer le cash flow (coût du trade)
+        cash_flow_change = -trade_quantity * trade_price  # Coût du trade
+        self.total_cash_flow += cash_flow_change
+        self.daily_cash_flow += cash_flow_change
         
         # Enregistrer dans l'historique
         self.inventory_history.append({
@@ -51,7 +62,8 @@ class InventoryController:
             'inventory': self.current_inventory,
             'trade_qty': trade_quantity,
             'trade_price': trade_price,
-            'pnl': self.total_pnl
+            'cash_flow': self.total_cash_flow,
+            'mid_price': self.current_mid_price
         })
         
         # Log si inventaire important
@@ -60,6 +72,30 @@ class InventoryController:
         
         # Vérifier les limites
         self._check_inventory_limits()
+    
+    def get_mark_to_market_pnl(self) -> float:
+        """Calcule le PnL mark-to-market (cash flow + valeur inventaire)"""
+        if self.current_mid_price <= 0:
+            # Si pas de prix mid, retourner seulement le cash flow
+            return self.total_cash_flow
+        
+        # PnL = Cash Flow + Valeur de l'inventaire au prix mid actuel
+        inventory_value = self.current_inventory * self.current_mid_price
+        return self.total_cash_flow + inventory_value
+    
+    def get_daily_mark_to_market_pnl(self) -> float:
+        """Calcule le PnL quotidien mark-to-market"""
+        if self.current_mid_price <= 0:
+            return self.daily_cash_flow
+        
+        # Pour le PnL quotidien, on utilise seulement le cash flow quotidien
+        # car l'inventaire est valorisé au prix actuel (pas de différence quotidienne)
+        inventory_value = self.current_inventory * self.current_mid_price
+        return self.daily_cash_flow + inventory_value
+    
+    def update_mid_price(self, mid_price: float):
+        """Met à jour le prix mid pour les calculs mark-to-market"""
+        self.current_mid_price = mid_price
     
     def _check_inventory_limits(self):
         """Vérifie si l'inventaire dépasse les limites"""
@@ -166,18 +202,40 @@ class InventoryController:
         """
         Détermine si le trading doit être suspendu
         
+        Pour le market making, nous utilisons des limites de perte adaptées:
+        - Limite quotidienne (daily_loss_limit_pct): % du capital alloué
+        - Plus souple que le stop-loss global pour permettre la respiration du MM
+        
         Returns:
             (should_pause, reason)
         """
         # Vérifier l'inventaire maximum
-        if abs(self.current_inventory) >= self.max_inventory:
+        if abs(self.current_inventory) > self.max_inventory:
             return True, f"Inventaire limite atteinte: {self.current_inventory:.4f}"
         
-        # Vérifier le PnL (stop loss)
+        # Vérifier le PnL quotidien (limite de perte spécifique au MM)
+        # CORRIGÉ: Utiliser mark-to-market PnL au lieu du cash flow
+        if hasattr(mm_config, 'daily_loss_limit_pct'):
+            # Calculer la perte maximale autorisée en valeur absolue
+            # basée sur un pourcentage du capital alloué
+            max_daily_loss_dollars = (mm_config.daily_loss_limit_pct / 100.0) * self.base_capital
+            
+            # Utiliser le PnL mark-to-market pour la décision de stop loss
+            daily_mtm_pnl = self.get_daily_mark_to_market_pnl()
+            
+            # Comparer avec la perte quotidienne (en valeur absolue)
+            if daily_mtm_pnl < -max_daily_loss_dollars:
+                pnl_pct = (daily_mtm_pnl / self.base_capital) * 100
+                return True, f"Stop loss déclenché: PnL={daily_mtm_pnl:.2f} ({pnl_pct:.1f}% du capital)"
+        
+        # Vérifier aussi le stop-loss global (protection ultime)
+        # CORRIGÉ: Utiliser mark-to-market PnL
         if hasattr(mm_config, 'stop_loss_pct'):
-            max_loss = mm_config.stop_loss_pct / 100.0
-            if self.total_pnl < -max_loss:
-                return True, f"Stop loss déclenché: PnL={self.total_pnl:.4f}"
+            max_total_loss_dollars = (mm_config.stop_loss_pct / 100.0) * self.base_capital
+            total_mtm_pnl = self.get_mark_to_market_pnl()
+            if total_mtm_pnl < -max_total_loss_dollars:
+                pnl_pct = (total_mtm_pnl / self.base_capital) * 100
+                return True, f"Stop loss global déclenché: PnL total={total_mtm_pnl:.2f} ({pnl_pct:.1f}%)"
         
         return False, ""
     
@@ -201,7 +259,10 @@ class InventoryController:
             'inventory_threshold': self.inventory_threshold,
             'max_inventory': self.max_inventory,
             'current_skew': self.calculate_inventory_skew(),
-            'total_pnl': self.total_pnl,
+            'total_pnl': self.get_mark_to_market_pnl(),  # CORRIGÉ: PnL mark-to-market
+            'daily_pnl': self.get_daily_mark_to_market_pnl(),  # CORRIGÉ: PnL quotidien mark-to-market
+            'total_cash_flow': self.total_cash_flow,  # Cash flow pour debug
+            'daily_cash_flow': self.daily_cash_flow,  # Cash flow quotidien pour debug
             'inventory_mean_100': inventory_mean,
             'inventory_std_100': inventory_std,
             'inventory_range': (inventory_min, inventory_max),
@@ -225,6 +286,7 @@ class InventoryController:
         print(f"Utilisation: {stats['inventory_utilization']:.1%}")
         print(f"Skew actuel: {skew:+.3f}")
         print(f"PnL total: ${stats['total_pnl']:+.2f}")
+        print(f"PnL quotidien: ${stats['daily_pnl']:+.2f}")
         print(f"Nombre de trades: {stats['trades_count']}")
         
         # Indicateur visuel du skew
@@ -238,7 +300,7 @@ class InventoryController:
     
     def reset_daily_stats(self):
         """Remet à zéro les stats quotidiennes"""
-        self.daily_pnl = 0.0
+        self.daily_cash_flow = 0.0  # CORRIGÉ: reset cash flow quotidien
         # Garder seulement l'historique récent pour économiser la mémoire
         if len(self.inventory_history) > 1000:
             self.inventory_history = self.inventory_history[-500:]
@@ -282,4 +344,4 @@ def test_inventory_control():
     print(f"Ajustement: {skewed_quotes.get('price_adjustment', 0):.4f}")
 
 if __name__ == "__main__":
-    test_inventory_control() 
+    test_inventory_control()

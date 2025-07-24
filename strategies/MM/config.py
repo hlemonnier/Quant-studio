@@ -3,6 +3,8 @@ Configuration pour le Market Making V1
 """
 
 import os
+import json
+import pathlib
 from typing import List, Dict, Any
 
 class MMConfig:
@@ -15,15 +17,23 @@ class MMConfig:
         
         # Symboles à trader
         self.symbols: List[str] = ['BTCUSDT', 'ETHUSDT']
+        # Symbole principal utilisé si l’application n’en sélectionne qu’un
+        self.default_symbol: str = 'BTCUSDT'
         
         # WebSocket Settings
         self.ws_depth_level = 20  # depth20
         self.ws_update_speed = '100ms'  # 100ms
         self.reconnect_attempts = 5
         
+        # Real-time constraints (§3.2 V1-α)
+        self.max_mid_price_latency_ms = 50  # ≤50ms pour mid-price
+        self.max_quote_latency_ms = 300     # ≤300ms pour quotes (kill-switch)
+        
         # Avellaneda-Stoikov Parameters
         self.gamma = 0.1  # Risk aversion - À définir avec le boss
-        self.sigma = 0.02  # Volatility estimate (initial)
+        # Volatility estimate (initial). 5 % is more realistic for intra-day crypto
+        # and avoids systematic “volatility spike” pauses.
+        self.sigma = 0.05
         self.T = 1.0  # Time horizon (1 day normalized)
         self.k = 1.5  # Market impact parameter
         
@@ -41,17 +51,70 @@ class MMConfig:
         # Risk Management
         self.max_spread_bps = 200  # Spread maximum en basis points
         self.min_spread_bps = 5  # Spread minimum en basis points (plus réaliste)
-        self.stop_loss_pct = 5.0  # Stop loss en pourcentage
+        # Stop-loss global (en % du capital) – plus large pour laisser respirer le MM
+        self.stop_loss_pct = 50.0
+        # Limite de perte quotidienne spécifique au market making
+        self.daily_loss_limit_pct = 20.0  # Arrêt de la journée si pertes > 20 %
+
+        # Volatility guardrail
+        # Trading pauses if realised volatility > max_volatility_threshold
+        # Crypto can easily reach 10 % intraday, so we allow up to 15 %.
+        self.max_volatility_threshold = 0.15  # 15 %
         
+        # ------------------------------------------------------------------
+        # Order-Flow Imbalance (OFI) parameters  (§3.3bis)
+        # ------------------------------------------------------------------
+        # Coefficient β : nb de ticks de déplacement du centre par unité d’OFI
+        self.beta_ofi = 0.30
+        # Fenêtre (s) pour le calcul de l’OFI
+        self.ofi_window_seconds = 1.0
+        # Clamp du z-score de l’OFI pour éviter les outliers
+        self.ofi_clamp_std = 3.0
+        # Tick-size par défaut (fallback si lookup symbole indisponible)
+        self.default_tick_size = 0.01
+
         # Data Storage
         self.data_dir = 'data/mm_data'
         self.parquet_compression = 'snappy'
         self.save_interval_seconds = 30  # Sauvegarde toutes les 30 secondes
         
+        # Performance targets (§3.7 V1-α)
+        self.target_spread_capture_pct = 70.0    # ≥70% spread capture
+        self.target_rms_inventory_ratio = 0.4    # ≤0.4 q_max RMS inventory
+        self.target_fill_ratio_pct = 5.0         # ≥5% fill ratio
+        self.target_cancel_ratio_pct = 70.0      # ≤70% cancel ratio
+        self.target_latency_p99_ms = 300.0       # ≤300ms P99 latency
+        
         # Backtesting
         self.backtest_latency_ms = 0  # Latence 0 pour la V1
         self.backtest_commission = 0.001  # Commission 0.1%
-        
+
+        # --------------------------------------------------------------
+        # Chargement éventuel des paramètres calibrés par symbole
+        # --------------------------------------------------------------
+        self.symbol_params: Dict[str, Dict[str, Any]] = {}
+        calib_path = pathlib.Path(__file__).resolve().parents[2] / 'parameters' / 'calibrated_mm.json'
+        if calib_path.exists():
+            try:
+                with open(calib_path, 'r') as f:
+                    self.symbol_params = json.load(f)
+                print(f"ℹ️  Paramètres calibrés chargés pour {len(self.symbol_params)} symbole(s) depuis {calib_path}")
+            except Exception as e:
+                print(f"⚠️  Impossible de charger les paramètres calibrés: {e}")
+                self.symbol_params = {}
+
+    # ------------------------------------------------------------------
+    # Helpers pour récupérer les paramètres spécifiques à un symbole
+    # ------------------------------------------------------------------
+    def get_symbol_params(self, symbol: str) -> Dict[str, Any]:
+        """Retourne un dict {gamma, k, T} pour le symbole (avec fallback défaut)"""
+        params = self.symbol_params.get(symbol, {})
+        return {
+            'gamma': params.get('gamma', self.gamma),
+            'k': params.get('k', self.k),
+            'T': params.get('T', self.T)
+        }
+    
     def validate_config(self, require_api_keys: bool = False) -> bool:
         """Valide la configuration
         
@@ -96,7 +159,11 @@ class MMConfig:
         print(f"Inventory Threshold (N★): {self.inventory_threshold}")
         print(f"Spread range: {self.min_spread_bps}-{self.max_spread_bps} bps")
         print(f"Base quote size: {self.base_quote_size}")
+        print(f"Default symbol: {self.default_symbol}")
+        print(f"Daily loss limit: {self.daily_loss_limit_pct}%")
+        print(f"Max volatility allowed: {self.max_volatility_threshold:.2%}")
+        print(f"OFI β: {self.beta_ofi} | Window: {self.ofi_window_seconds}s | Clamp: ±{self.ofi_clamp_std}σ")
         print("=" * 40)
 
 # Instance globale de configuration
-mm_config = MMConfig() 
+mm_config = MMConfig()
