@@ -80,10 +80,16 @@ class AvellanedaStoikovV15Quoter(AvellanedaStoikovQuoter):
             mid_price, inventory, time_remaining
         )
         
-        # 2. Compute base spread (A&S)
-        base_spread = self.compute_optimal_spread(
+        # 2. Compute base spread (A&S) - convert from fraction to absolute price
+        base_spread_fraction = self.compute_optimal_spread(
             mid_price, inventory, time_remaining
         )
+        base_spread = base_spread_fraction * mid_price
+        
+        # Ensure minimum base spread to avoid zero spread issues
+        min_base_spread = self.min_spread_ticks * self.tick_size
+        if base_spread < min_base_spread:
+            base_spread = min_base_spread
         
         # 3. Enhanced centre calculation with multi-signal approach
         centre_price = self._compute_enhanced_centre(
@@ -128,11 +134,11 @@ class AvellanedaStoikovV15Quoter(AvellanedaStoikovQuoter):
             'half_spread': half_spread,
             
             # V1.5 components breakdown
-            'inventory_adjustment': self.kappa_inv * inventory,
+            'inventory_adjustment': self.kappa_inv * inventory * self.tick_size,
             'ofi_adjustment': mm_config.beta_ofi * ofi * self.tick_size,
             'di_adjustment': self.beta_di * di * self.tick_size,
-            'volatility_spread_component': self._get_volatility_spread_component(mid_price),
-            'inventory_spread_component': self.kappa_inv * abs(inventory) * self.tick_size,
+            'volatility_spread_component': self._get_volatility_spread_component(base_spread),
+            'inventory_spread_component': self.kappa_inv * abs(inventory) * base_spread,
             
             # Model parameters
             'volatility': self.sigma,
@@ -226,9 +232,9 @@ class AvellanedaStoikovV15Quoter(AvellanedaStoikovQuoter):
         
         return centre_price, spread
     
-    def _get_volatility_spread_component(self, mid_price: float) -> float:
+    def _get_volatility_spread_component(self, base_spread: float) -> float:
         """Get the volatility component of the dynamic spread"""
-        return self.kappa_vol * self.sigma * mid_price
+        return self.kappa_vol * base_spread * self.sigma
     
     def validate_quotes_v15(self, quotes: Dict[str, float]) -> bool:
         """
