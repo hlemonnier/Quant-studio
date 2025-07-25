@@ -41,22 +41,48 @@ class BinanceDepthStreamCapture:
             async with websockets.connect(url) as websocket:
                 self.logger.info("✅ WebSocket connected for depth diffs")
                 
+                message_count = 0
                 async for message in websocket:
                     if not self.is_running:
                         break
+                    
+                    message_count += 1
+                    
+                    # Log des premiers messages pour diagnostic
+                    if message_count <= 5:
+                        self.logger.info(f"📨 Received WebSocket message #{message_count}")
+                        self.logger.info(f"📨 Message length: {len(message)} chars")
                         
                     try:
                         data = json.loads(message)
                         
+                        # Log des premières données parsées
+                        if message_count <= 3:
+                            self.logger.info(f"📊 Parsed data keys: {list(data.keys())}")
+                        
                         # Traiter les données pour extraire le symbole
                         processed_data = self._process_depth_data(data)
                         
+                        # Log des données traitées
+                        if message_count <= 3:
+                            if processed_data:
+                                self.logger.info(f"✅ Processed data for symbol: {processed_data.get('symbol')}")
+                                self.logger.info(f"✅ Processed data keys: {list(processed_data.keys())}")
+                            else:
+                                self.logger.warning(f"⚠️ No processed data returned")
+                        
                         # Appeler le callback avec les données traitées
                         if self.on_data_callback and processed_data:
+                            if message_count <= 3:
+                                self.logger.info(f"🔄 Calling callback with processed data")
                             self.on_data_callback(processed_data)
+                        elif message_count <= 3:
+                            self.logger.warning(f"⚠️ No callback or no processed data - callback: {self.on_data_callback is not None}, data: {processed_data is not None}")
                             
                     except Exception as e:
                         self.logger.error(f"❌ Error processing message: {e}")
+                        if message_count <= 5:
+                            self.logger.error(f"❌ Raw message: {message[:200]}...")
                         
         except Exception as e:
             self.logger.error(f"❌ WebSocket connection error: {e}")
