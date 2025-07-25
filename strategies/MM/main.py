@@ -108,25 +108,49 @@ async def run_paper_trading(symbols: List[str], duration_hours: Optional[int] = 
             tasks.append(asyncio.create_task(engine.run_trading_loop()))
         
         # Wait for all tasks or timeout
-        if duration_hours:
-            print(f"⏱️  Running for {duration_hours} hours")
-            await asyncio.wait_for(
-                asyncio.gather(*tasks),
-                timeout=duration_hours * 3600
-            )
-        else:
-            await asyncio.gather(*tasks)
+        try:
+            if duration_hours:
+                print(f"⏱️  Running for {duration_hours} hours")
+                await asyncio.wait_for(
+                    asyncio.gather(*tasks),
+                    timeout=duration_hours * 3600
+                )
+            else:
+                await asyncio.gather(*tasks)
+        except (KeyboardInterrupt, asyncio.CancelledError):
+            print("\n🛑 Graceful shutdown initiated...")
+            # Cancel all running tasks
+            for task in tasks:
+                if not task.done():
+                    task.cancel()
+            
+            # Wait for all tasks to complete cancellation
+            if tasks:
+                await asyncio.gather(*tasks, return_exceptions=True)
     
-    except KeyboardInterrupt:
-        print("\n🛑 Graceful shutdown initiated...")
     except asyncio.TimeoutError:
         print("\n⏱️  Trading duration completed")
+        # Cancel remaining tasks
+        for task in tasks:
+            if not task.done():
+                task.cancel()
+        if tasks:
+            await asyncio.gather(*tasks, return_exceptions=True)
     except Exception as e:
         print(f"\n❌ Error in trading loop: {e}")
+        # Cancel remaining tasks
+        for task in tasks:
+            if not task.done():
+                task.cancel()
+        if tasks:
+            await asyncio.gather(*tasks, return_exceptions=True)
     finally:
         # Stop all engines
         for engine in engines:
-            await engine.stop()
+            try:
+                await engine.stop()
+            except Exception as e:
+                print(f"⚠️ Error stopping engine {engine.symbol}: {e}")
         
         # Print final summary for each engine
         print("\n📊 Final Summary:")
@@ -248,14 +272,22 @@ def main():
         print(f"\n🛠  Auto-calibration avant lancement du mode {args.mode}")
         run_calibration_mode(mm_config.symbols)
 
-    if args.mode == 'paper-trading':
-        asyncio.run(run_paper_trading(symbols, duration_hours=args.duration, version=args.version))
-    elif args.mode == 'backtest':
-        run_backtest_mode()
-    elif args.mode == 'calibration':
-        run_calibration_mode(symbols)
-    elif args.mode == 'live':
-        asyncio.run(run_live_trading(symbols, version=args.version))
+    try:
+        if args.mode == 'paper-trading':
+            asyncio.run(run_paper_trading(symbols, duration_hours=args.duration, version=args.version))
+        elif args.mode == 'backtest':
+            run_backtest_mode()
+        elif args.mode == 'calibration':
+            run_calibration_mode(symbols)
+        elif args.mode == 'live':
+            asyncio.run(run_live_trading(symbols, version=args.version))
+    except KeyboardInterrupt:
+        print("\n🛑 Program interrupted by user")
+        print("✅ Shutdown complete")
+    except Exception as e:
+        print(f"\n❌ Unexpected error: {e}")
+        import traceback
+        traceback.print_exc()
 
 
 if __name__ == "__main__":
