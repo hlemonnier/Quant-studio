@@ -165,13 +165,18 @@ class TradingEngine:
     async def _initialize_market_data(self) -> bool:
         """Initialize connection to market data"""
         try:
-            # Get initial snapshot
-            if not self.local_book.get_snapshot():
+            # Initialize empty book (WebSocket-only mode)
+            if not self.local_book.initialize_empty_book():
                 return False
+            
+            # Wait 2 seconds for WebSocket data to populate the book
+            self.logger.info("⏱️ Waiting 2s for WebSocket data to populate book...")
+            await asyncio.sleep(2.0)
             
             self.current_mid = self.local_book.get_mid_price()
             if not self.current_mid:
-                return False
+                self.logger.warning("⚠️ No mid price yet, will update when WebSocket data arrives")
+                self.current_mid = 0  # Will be updated by WebSocket
                 
             self.logger.info(f"✅ Initialized: Mid=${self.current_mid:.2f}")
             return True

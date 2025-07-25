@@ -290,11 +290,8 @@ class LocalBook:
         print("=" * 50)
     
     def resync_if_needed(self) -> bool:
-        """Re-synchronise le book si nécessaire"""
-        if not self.is_synchronized:
-            self.logger.info("🔄 Re-synchronisation du book...")
-            return self.get_snapshot()
-        return True
+        """Re-synchronise le book si nécessaire (WebSocket mode - toujours sync)"""
+        return True  # En mode WebSocket pur, toujours synchronisé
     
     def apply_ws_update(self, symbol: str, diff_data: dict) -> bool:
         """Applique une mise à jour WebSocket (wrapper pour apply_diff)"""
@@ -321,10 +318,10 @@ class MultiBookManager:
         self.logger = logging.getLogger("MultiBookManager")
     
     def sync_all_books(self) -> Dict[str, bool]:
-        """Synchronise tous les books"""
+        """Synchronise tous les books (WebSocket mode - toujours sync)"""
         results = {}
         for symbol, book in self.books.items():
-            results[symbol] = book.get_snapshot()
+            results[symbol] = book.initialize_empty_book()
         return results
     
     def apply_ws_update(self, symbol: str, diff_data: dict) -> bool:
@@ -351,11 +348,11 @@ if __name__ == "__main__":
     
     book = LocalBook('BTCUSDT')
     
-    if book.get_snapshot():
-        print("✅ Snapshot OK")
+    if book.initialize_empty_book():
+        print("✅ Empty book initialized")
         book.print_book_summary()
         
         stats = book.get_book_stats()
         print(f"\n📊 Stats: Mid=${stats['mid_price']:.2f}, Spread={stats['spread_bps']:.1f}bps")
     else:
-        print("❌ Erreur snapshot")
+        print("❌ Erreur initialization")
