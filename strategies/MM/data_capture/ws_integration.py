@@ -48,9 +48,12 @@ class BinanceDepthStreamCapture:
                     try:
                         data = json.loads(message)
                         
-                        # Traiter les données et appeler le callback
-                        if self.on_data_callback:
-                            self.on_data_callback(data)
+                        # Traiter les données pour extraire le symbole
+                        processed_data = self._process_depth_data(data)
+                        
+                        # Appeler le callback avec les données traitées
+                        if self.on_data_callback and processed_data:
+                            self.on_data_callback(processed_data)
                             
                     except Exception as e:
                         self.logger.error(f"❌ Error processing message: {e}")
@@ -61,6 +64,48 @@ class BinanceDepthStreamCapture:
             self.is_running = False
             self.logger.info("🛑 WebSocket connection closed")
     
+    def _process_depth_data(self, data: dict) -> Optional[dict]:
+        """Traite les données WebSocket pour extraire le symbole"""
+        try:
+            # Format stream combiné avec identifiant
+            if 'stream' in data and 'data' in data:
+                stream_name = data.get('stream', '')
+                symbol = stream_name.split('@')[0].upper()
+                depth_data = data.get('data', {})
+                
+                # Ajouter le symbole aux données
+                depth_data['symbol'] = symbol
+                return depth_data
+            
+            # Format stream direct - identifier par prix
+            elif 'bids' in data and 'asks' in data:
+                bids = data.get('bids', [])
+                asks = data.get('asks', [])
+                
+                if bids and asks:
+                    best_bid = float(bids[0][0])
+                    best_ask = float(asks[0][0])
+                    mid_price = (best_bid + best_ask) / 2
+                    
+                    # Identifier le symbole par range de prix
+                    if mid_price > 10000:  # BTC range
+                        symbol = 'BTCUSDT'
+                    elif mid_price > 1000:  # ETH range  
+                        symbol = 'ETHUSDT'
+                    else:
+                        # Fallback: utiliser le premier symbole configuré
+                        symbol = self.symbols[0].upper() if self.symbols else 'UNKNOWN'
+                    
+                    # Ajouter le symbole aux données
+                    data['symbol'] = symbol
+                    return data
+            
+            return None
+            
+        except Exception as e:
+            self.logger.error(f"❌ Error processing depth data: {e}")
+            return None
+
     async def stop_capture(self):
         """Arrête la capture"""
         self.is_running = False
