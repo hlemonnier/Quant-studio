@@ -104,8 +104,17 @@ class LocalBook:
                 pass
             else:
                 self.logger.warning(f"⚠️  Gap détecté: attendu {self.last_update_id + 1}, reçu {first_update_id}-{final_update_id}")
-                self.is_synchronized = False
-                return False
+                self.logger.info("🔄 Tentative de resynchronisation automatique...")
+                
+                # Essayer de resynchroniser automatiquement
+                if self.fetch_snapshot():
+                    self.logger.info("✅ Resynchronisation réussie, réessai de l'update")
+                    # Réessayer l'update après resynchronisation
+                    return self.apply_diff(symbol, diff_data)
+                else:
+                    self.logger.error("❌ Échec de la resynchronisation")
+                    self.is_synchronized = False
+                    return False
             
             # Appliquer les modifications bids
             for price_str, qty_str in diff_data.get('b', []):
