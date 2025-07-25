@@ -69,6 +69,7 @@ class LocalBook:
             self.logger.error(f"❌ Erreur récupération snapshot: {e}")
             self.sync_errors += 1
             return False
+
     
     def apply_diff(self, diff_data: dict) -> bool:
         """Applique un diff WebSocket au book local"""
@@ -78,8 +79,17 @@ class LocalBook:
             final_update_id = diff_data.get('u')
             
             # Log des premières applications pour diagnostic
-            if self.update_count < 5:
+            if self.update_count < 10:
                 self.logger.info(f"🔄 Applying diff #{self.update_count+1} for {self.symbol}: U={first_update_id}, u={final_update_id}")
+                self.logger.info(f"📊 Diff data keys: {list(diff_data.keys())}")
+                if 'b' in diff_data:
+                    self.logger.info(f"📈 Bids updates: {len(diff_data['b'])} entries")
+                    if diff_data['b']:
+                        self.logger.info(f"📈 First bid update: {diff_data['b'][0]}")
+                if 'a' in diff_data:
+                    self.logger.info(f"📉 Asks updates: {len(diff_data['a'])} entries")
+                    if diff_data['a']:
+                        self.logger.info(f"📉 First ask update: {diff_data['a'][0]}")
             
             if not self.is_synchronized:
                 self.logger.warning("⚠️  Book non synchronisé, ignoré diff")
@@ -127,6 +137,12 @@ class LocalBook:
             
             # Nettoyer le book (garder seulement les meilleurs niveaux)
             self._trim_book()
+            
+            # Log après application pour vérifier les changements
+            if self.update_count <= 10:
+                best_bid = max(self.bids.keys()) if self.bids else 0
+                best_ask = min(self.asks.keys()) if self.asks else 0
+                self.logger.info(f"✅ Update #{self.update_count} applied: Best bid={best_bid:.2f}, Best ask={best_ask:.2f}")
             
             return True
             

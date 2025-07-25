@@ -124,6 +124,20 @@ class WSLocalBookIntegration:
         self.local_books = local_books
         self.logger = logging.getLogger(f"WSIntegration-{'-'.join(symbols)}")
         
+        # Créer un logger de fichier pour les mises à jour WebSocket
+        import os
+        from datetime import datetime
+        log_dir = "logs"
+        os.makedirs(log_dir, exist_ok=True)
+        log_file = f"{log_dir}/websocket_updates_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+        
+        self.file_logger = logging.getLogger(f"WSUpdates-{'-'.join(symbols)}")
+        file_handler = logging.FileHandler(log_file)
+        file_handler.setFormatter(logging.Formatter('%(asctime)s - %(message)s'))
+        self.file_logger.addHandler(file_handler)
+        self.file_logger.setLevel(logging.INFO)
+        self.file_logger.info(f"🚀 WebSocket updates logging started for {symbols}")
+        
         # Statistiques de mise à jour
         self.update_counts = {symbol: 0 for symbol in symbols}
         self.error_counts = {symbol: 0 for symbol in symbols}
@@ -162,8 +176,22 @@ class WSLocalBookIntegration:
             if self.update_counts[symbol] < 5:
                 self.logger.info(f"🔄 Converted diff data keys: {list(diff_data.keys())}")
             
+            # Logger dans le fichier pour diagnostic
+            self.file_logger.info(f"SYMBOL: {symbol}")
+            self.file_logger.info(f"RAW_DATA: {depth_data}")
+            self.file_logger.info(f"CONVERTED_DATA: {diff_data}")
+            
             # Appliquer la mise à jour au local book
             success = self.local_books[symbol].apply_ws_update(symbol, diff_data)
+            
+            # Logger le résultat
+            self.file_logger.info(f"UPDATE_RESULT: {success}")
+            if success:
+                # Logger l'état du book après mise à jour
+                book = self.local_books[symbol]
+                best_bid = max(book.bids.keys()) if book.bids else 0
+                best_ask = min(book.asks.keys()) if book.asks else 0
+                self.file_logger.info(f"BOOK_STATE: Best bid={best_bid:.2f}, Best ask={best_ask:.2f}, Updates={book.update_count}")
             
             if success:
                 self.update_counts[symbol] += 1
@@ -181,8 +209,10 @@ class WSLocalBookIntegration:
                     
         except Exception as e:
             self.logger.error(f"❌ Error processing depth update: {e}")
+            self.file_logger.error(f"ERROR: {e}")
             import traceback
             self.logger.error(f"Traceback: {traceback.format_exc()}")
+            self.file_logger.error(f"TRACEBACK: {traceback.format_exc()}")
     
     def _convert_to_diff_format(self, depth_data: dict) -> dict:
         """Convertit les données WebSocket au format diff attendu par LocalBook"""
