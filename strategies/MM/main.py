@@ -45,17 +45,37 @@ from strategies.MM.simple_backtest import run_simple_backtest
 from strategies.MM.utils.parameter_calibration import ParameterCalibrator, generate_synthetic_calibration_data
 
 
-def setup_logging(level: str = "INFO"):
+def setup_logging(level: str = "WARNING"):
     """Configure logging for the market making system"""
     pathlib.Path('logs').mkdir(exist_ok=True)
+    
+    # Format plus propre pour le trading (sans timestamp pour console)
+    console_format = '%(levelname)s:%(name)s:%(message)s'
+    file_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    
+    # Si niveau WARNING ou plus élevé, format encore plus propre
+    if level.upper() in ['WARNING', 'ERROR']:
+        console_format = '%(message)s'
+    
     logging.basicConfig(
         level=getattr(logging, level.upper()),
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        format=console_format,
         handlers=[
             logging.StreamHandler(sys.stdout),
             logging.FileHandler(f'logs/mm_{datetime.now().strftime("%Y%m%d")}.log', mode='a')
         ]
     )
+    
+    # Le fichier garde toujours le format complet
+    file_handler = logging.FileHandler(f'logs/mm_{datetime.now().strftime("%Y%m%d")}.log', mode='a')
+    file_handler.setFormatter(logging.Formatter(file_format))
+    
+    # Remplacer le handler de fichier
+    root_logger = logging.getLogger()
+    for handler in root_logger.handlers[:]:
+        if isinstance(handler, logging.FileHandler):
+            root_logger.removeHandler(handler)
+    root_logger.addHandler(file_handler)
 
 
 async def run_paper_trading(symbols: List[str], duration_hours: Optional[int] = None, version: str = "V1-α"):
@@ -182,30 +202,47 @@ def run_backtest_mode():
         print(f"❌ Backtesting failed: {e}")
 
 
-def run_calibration_mode(symbols: List[str]):
+def run_calibration_mode(symbols: List[str], verbose: bool = False):
     """Run parameter calibration mode for one or several symbols"""
     print("🔧 Starting Parameter Calibration")
     print("=" * 60)
 
-    for sym in symbols:
-        print(f"\n📈 Calibrating parameters for {sym} ...")
-        try:
-            calibrator = ParameterCalibrator(sym)
+    # Temporairement réduire les logs pour la calibration si pas verbose
+    original_levels = {}
+    if not verbose:
+        # Réduire les logs pour tous les calibrateurs
+        for sym in symbols:
+            logger_name = f'ParamCalibrator-{sym}'
+            calibration_logger = logging.getLogger(logger_name)
+            original_levels[logger_name] = calibration_logger.level
+            calibration_logger.setLevel(logging.WARNING)
 
-            # TODO: Replace synthetic generator by real historical data loading
-            market_data, trading_history = generate_synthetic_calibration_data()
+    try:
+        for sym in symbols:
+            print(f"\n📈 Calibrating parameters for {sym} ...")
+            try:
+                calibrator = ParameterCalibrator(sym)
 
-            results = calibrator.run_full_calibration(market_data, trading_history)
+                # TODO: Replace synthetic generator by real historical data loading
+                market_data, trading_history = generate_synthetic_calibration_data()
 
-            print(f"\n🎯 Calibration Results for {sym}")
-            print("=" * 40)
-            for param, value in results.items():
-                print(f"  {param}: {value:.6f}")
-            print("=" * 40)
-            print(f"✅ Parameters updated and saved for {sym}")
+                results = calibrator.run_full_calibration(market_data, trading_history)
 
-        except Exception as e:
-            print(f"❌ Calibration failed for {sym}: {e}")
+                print(f"\n🎯 Calibration Results for {sym}")
+                print("=" * 40)
+                for param, value in results.items():
+                    print(f"  {param}: {value:.6f}")
+                print("=" * 40)
+                print(f"✅ Parameters updated and saved for {sym}")
+
+            except Exception as e:
+                print(f"❌ Calibration failed for {sym}: {e}")
+    
+    finally:
+        # Restaurer le niveau de logging original
+        if not verbose:
+            for logger_name, original_level in original_levels.items():
+                logging.getLogger(logger_name).setLevel(original_level)
 
 
 async def run_live_trading(symbols: List[str], version: str = "V1-α"):
@@ -248,8 +285,8 @@ def main():
                        help='Duration in hours (for paper trading)')
     parser.add_argument('--log-level',
                        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'],
-                       default='INFO',
-                       help='Logging level')
+                       default='WARNING',
+                       help='Logging level (default: WARNING for clean trading output)')
     
     args = parser.parse_args()
     
@@ -268,9 +305,10 @@ def main():
     print()
     
     # Auto-calibration before other modes (except calibration itself)
+    verbose_calibration = args.log_level in ['DEBUG', 'INFO']
     if args.mode != 'calibration':
         print(f"\n🛠  Auto-calibration avant lancement du mode {args.mode}")
-        run_calibration_mode(mm_config.symbols)
+        run_calibration_mode(mm_config.symbols, verbose=verbose_calibration)
 
     try:
         if args.mode == 'paper-trading':
@@ -278,7 +316,7 @@ def main():
         elif args.mode == 'backtest':
             run_backtest_mode()
         elif args.mode == 'calibration':
-            run_calibration_mode(symbols)
+            run_calibration_mode(symbols, verbose=verbose_calibration)
         elif args.mode == 'live':
             asyncio.run(run_live_trading(symbols, version=args.version))
     except KeyboardInterrupt:

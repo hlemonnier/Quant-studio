@@ -37,7 +37,7 @@ class LocalBook:
         self.asks = {}
         self.is_synchronized = True  # Toujours synchronisé en mode WebSocket pur
         self.last_sync_time = datetime.now()
-        self.logger.info(f"✅ LocalBook initialisé en mode WebSocket pur pour {self.symbol}")
+        # LocalBook initialized silently
         return True
 
     

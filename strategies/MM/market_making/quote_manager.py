@@ -104,7 +104,7 @@ class QuoteManager:
         # Async coordination
         self._refresh_lock = asyncio.Lock()
         
-        self.logger.info(f"📋 Quote Manager initialized for {symbol} (max_age={self.max_age_ms}ms)")
+        self.logger.warning(f"📋 Quote Manager initialized for {symbol} (max_age={self.max_age_ms}ms)")
     
     def add_quote(self, quote_id: str, side: str, price: float, size: float,
                   ofi: float = 0.0, di: float = 0.0) -> ManagedQuote:

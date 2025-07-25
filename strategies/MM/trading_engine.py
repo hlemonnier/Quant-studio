@@ -71,12 +71,12 @@ class TradingEngine:
             self.quoter = AvellanedaStoikovV15Quoter(symbol)
             self.di_calc = DepthImbalanceCalculator(symbol)
             self.quote_manager = QuoteManager(symbol)
-            self.logger.info("🚀 V1.5 Enhanced Trading Engine initialized")
+            self.logger.warning("🚀 V1.5 Enhanced Trading Engine initialized")
         else:
             self.quoter = AvellanedaStoikovQuoter(symbol)
             self.di_calc = None
             self.quote_manager = None
-            self.logger.info("🚀 V1-α Trading Engine initialized")
+            self.logger.warning("🚀 V1-α Trading Engine initialized")
         
         # Trading state
         self.active_quotes: Dict[str, Quote] = {}
@@ -96,7 +96,7 @@ class TradingEngine:
         
         # WebSocket integration for real-time data
         self.ws_integration = TradingEngineWSIntegration(self)
-        self.logger.info("🔌 WebSocket integration initialized")
+        # WebSocket integration initialized silently
         self.session_start = time.time()
         
         # Control flag for trading loop
@@ -104,7 +104,7 @@ class TradingEngine:
         
     async def run_trading_loop(self):
         """Main entry point to run the trading loop"""
-        self.logger.info(f"🚀 Starting trading loop for {self.symbol}")
+        # Trading loop starting silently
         self.running = True
         
         try:
@@ -182,7 +182,7 @@ class TradingEngine:
                 return False
             
             # Wait 2 seconds for WebSocket data to populate the book
-            self.logger.info("⏱️ Waiting 2s for WebSocket data to populate book...")
+            # Wait 2s for WebSocket data to populate book
             await asyncio.sleep(2.0)
             
             self.current_mid = self.local_book.get_mid_price()
@@ -190,7 +190,7 @@ class TradingEngine:
                 self.logger.warning("⚠️ No mid price yet, will update when WebSocket data arrives")
                 self.current_mid = 0  # Will be updated by WebSocket
                 
-            self.logger.info(f"✅ Initialized: Mid=${self.current_mid:.2f}")
+            # Initialized silently
             return True
             
         except Exception as e:
@@ -199,7 +199,7 @@ class TradingEngine:
     
     async def _main_trading_loop(self):
         """Main trading loop implementing §3.5"""
-        self.logger.info("🔄 Starting main trading loop")
+        # Main trading loop starting
         
         while self.running:
             try:

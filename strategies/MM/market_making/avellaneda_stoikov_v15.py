@@ -56,7 +56,7 @@ class AvellanedaStoikovV15Quoter(AvellanedaStoikovQuoter):
         self._last_volatility = None
         self._cached_base_spread = None
         
-        self.logger.info(f"📊 V1.5 Quoter initialized: β_di={self.beta_di}, "
+        self.logger.warning(f"📊 V1.5 Quoter initialized: β_di={self.beta_di}, "
                         f"κ_inv={self.kappa_inv}, κ_vol={self.kappa_vol}")
     
     def compute_quotes_v15(self, mid_price: float, inventory: float,

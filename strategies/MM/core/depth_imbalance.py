@@ -72,7 +72,7 @@ class DepthImbalanceCalculator:
         self._current_di_normalized: float = 0.0
         self._current_di_filtered: float = 0.0
         
-        self.logger.info(f"📊 DI Calculator initialized for {symbol}")
+        self.logger.warning(f"📊 DI Calculator initialized for {symbol}")
     
     def update_depth(self, depth_bid_l1_l5: float, depth_ask_l1_l5: float, 
                      timestamp: Optional[float] = None) -> float:
