@@ -208,6 +208,14 @@ class TradingEngineWSIntegration:
                 self.logger.warning(f"⚠️ Error during task cleanup: {e}")
         
         self.logger.info(f"🛑 WebSocket integration stopped for {self.symbol}")
+    
+    def get_integration_stats(self):
+        """Retourne les statistiques d'intégration WebSocket"""
+        return {
+            'symbol': self.symbol,
+            'active': hasattr(self, 'ws_task') and not self.ws_task.done() if hasattr(self, 'ws_task') else False,
+            'connection_status': 'connected' if hasattr(self, 'ws_task') else 'disconnected'
+        }
 
 
 # Test standalone
