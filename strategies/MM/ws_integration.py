@@ -7,9 +7,63 @@ reçoive les mises à jour en temps réel et que le DI fonctionne correctement.
 
 import asyncio
 import logging
+import json
+import websockets
 from typing import Dict, Optional, Callable
 from .ws_data_capture import BinanceWSCapture
 from .local_book import LocalBook
+
+
+class BinanceDepthStreamCapture:
+    """WebSocket capture spécialisé pour les diffs depth incrémentaux"""
+    
+    def __init__(self, symbols: list, on_data_callback: Optional[Callable] = None):
+        self.symbols = [s.lower() for s in symbols]
+        self.on_data_callback = on_data_callback
+        self.ws_url = "wss://stream.binance.com:9443/ws/"
+        self.logger = logging.getLogger(f"DepthStream-{'-'.join(symbols)}")
+        self.is_running = False
+        
+    def create_stream_url(self) -> str:
+        """Crée l'URL pour les streams depth (diffs incrémentaux)"""
+        # Utiliser depth@100ms pour les diffs incrémentaux au lieu de depth20@100ms
+        streams = [f"{symbol}@depth@100ms" for symbol in self.symbols]
+        combined_streams = '/'.join(streams)
+        return f"{self.ws_url}{combined_streams}"
+    
+    async def start_capture(self):
+        """Démarre la capture WebSocket"""
+        self.is_running = True
+        url = self.create_stream_url()
+        self.logger.info(f"🚀 Connecting to {url}")
+        
+        try:
+            async with websockets.connect(url) as websocket:
+                self.logger.info("✅ WebSocket connected for depth diffs")
+                
+                async for message in websocket:
+                    if not self.is_running:
+                        break
+                        
+                    try:
+                        data = json.loads(message)
+                        
+                        # Traiter les données et appeler le callback
+                        if self.on_data_callback:
+                            self.on_data_callback(data)
+                            
+                    except Exception as e:
+                        self.logger.error(f"❌ Error processing message: {e}")
+                        
+        except Exception as e:
+            self.logger.error(f"❌ WebSocket connection error: {e}")
+        finally:
+            self.is_running = False
+            self.logger.info("🛑 WebSocket connection closed")
+    
+    async def stop_capture(self):
+        """Arrête la capture"""
+        self.is_running = False
 
 
 class WSLocalBookIntegration:
@@ -29,8 +83,8 @@ class WSLocalBookIntegration:
         self.update_counts = {symbol: 0 for symbol in symbols}
         self.error_counts = {symbol: 0 for symbol in symbols}
         
-        # Créer le WebSocket capture avec callback
-        self.ws_capture = BinanceWSCapture(
+        # Créer le WebSocket capture spécialisé pour les diffs depth
+        self.ws_capture = BinanceDepthStreamCapture(
             symbols=symbols,
             on_data_callback=self._on_depth_update
         )
@@ -66,13 +120,24 @@ class WSLocalBookIntegration:
     
     def _convert_to_diff_format(self, depth_data: dict) -> dict:
         """Convertit les données WebSocket au format diff attendu par LocalBook"""
-        # Le format attendu par apply_diff() selon local_book.py ligne 77-78
+        # Les données depth@100ms de Binance arrivent déjà au bon format :
+        # {
+        #   "e": "depthUpdate",
+        #   "E": 1672515782136,
+        #   "s": "BNBBTC", 
+        #   "U": 157,
+        #   "u": 160,
+        #   "b": [["0.0024", "10"]],
+        #   "a": [["0.0026", "100"]]
+        # }
+        
+        # Le format est déjà compatible avec LocalBook.apply_diff()
         return {
-            'U': depth_data.get('last_update_id', 0),  # first_update_id
-            'u': depth_data.get('last_update_id', 0),  # final_update_id  
-            'b': depth_data.get('bids', []),           # bids updates
-            'a': depth_data.get('asks', []),           # asks updates
-            'E': depth_data.get('event_time', 0),      # event time
+            'U': depth_data.get('U', 0),  # first_update_id
+            'u': depth_data.get('u', 0),  # final_update_id  
+            'b': depth_data.get('b', []), # bids updates (déjà en strings)
+            'a': depth_data.get('a', []), # asks updates (déjà en strings)
+            'E': depth_data.get('E', 0),  # event time
         }
     
     async def start(self):
