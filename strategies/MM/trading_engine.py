@@ -27,6 +27,7 @@ from .quote_manager import QuoteManager
 from .local_book import LocalBook
 from .inventory_control import InventoryController
 from .kpi_tracker import KPITracker
+from .ws_integration import TradingEngineWSIntegration
 
 
 @dataclass
@@ -92,6 +93,10 @@ class TradingEngine:
         # Performance tracking
         self.total_quotes_sent = 0
         self.total_fills = 0
+        
+        # WebSocket integration for real-time data
+        self.ws_integration = TradingEngineWSIntegration(self)
+        self.logger.info("🔌 WebSocket integration initialized")
         self.session_start = time.time()
         
         # Control flag for trading loop
@@ -108,6 +113,9 @@ class TradingEngine:
                 self.logger.error("❌ Failed to initialize market data")
                 return
             
+            # Start WebSocket integration for real-time updates
+            await self.ws_integration.start_integration()
+            
             # Run main trading loop
             await self._main_trading_loop()
             
@@ -118,6 +126,10 @@ class TradingEngine:
         finally:
             # Ensure we clean up on exit
             await self._cancel_all_quotes()
+            
+            # Stop WebSocket integration
+            await self.ws_integration.stop_integration()
+            
             self.logger.info("Trading loop stopped")
     
     async def stop(self):
@@ -127,6 +139,9 @@ class TradingEngine:
         
         # Cancel all active quotes
         await self._cancel_all_quotes()
+        
+        # Stop WebSocket integration
+        await self.ws_integration.stop_integration()
         
         # Wait a bit to ensure all cancels are processed
         await asyncio.sleep(0.5)
@@ -217,18 +232,17 @@ class TradingEngine:
                 await asyncio.sleep(1.0)
     
     async def _update_market_data(self):
-        """Update market data from local book"""
-        # In a real implementation, this would process WebSocket updates
-        # For now, we simulate market movement
+        """Update market data from local book (now with real WebSocket data!)"""
+        # Get real-time mid price from local book (updated by WebSocket)
+        new_mid = self.local_book.get_mid_price()
         
-        # Update mid price (simulate small random walk)
-        if self.current_mid > 0:
-            change_pct = np.random.normal(0, 0.0001)  # 0.01% std dev
-            self.current_mid *= (1 + change_pct)
+        if new_mid > 0:
+            # Update mid price with real market data
+            self.current_mid = new_mid
             
-            # Simuler la latence mid-price (§3.2 V1-α)
-            # En mode simulation, on génère une latence aléatoire
-            self.last_mid_price_latency_ms = np.random.uniform(10, 80)  # 10-80ms
+            # Calculate real latency from WebSocket integration
+            # For now, use a small simulated latency as placeholder
+            self.last_mid_price_latency_ms = np.random.uniform(10, 50)  # 10-50ms
             
             # Update quoter's price history for volatility estimation
             self.quoter.update_volatility(self.current_mid)
@@ -561,6 +575,13 @@ class TradingEngine:
             if qm_stats:
                 print(f"Quote Ageing: {qm_stats.get('aged_out', 0)} aged out, "
                       f"{qm_stats.get('signal_refreshed', 0)} signal refreshed")
+        
+        # WebSocket integration stats
+        ws_stats = self.ws_integration.get_integration_stats()
+        if ws_stats:
+            print(f"WebSocket Updates: {ws_stats.get('updates', 0)} received, "
+                  f"{ws_stats.get('errors', 0)} errors "
+                  f"({ws_stats.get('success_rate', 0):.1f}% success)")
         
         print(f"Quotes Sent: {status['total_quotes']} | Fills: {status['total_fills']}")
         print(f"Active Quotes: {status['active_quotes']}")
