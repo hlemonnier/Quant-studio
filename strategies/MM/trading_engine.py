@@ -27,7 +27,7 @@ from .market_making.quote_manager import QuoteManager
 from .data_capture.local_book import LocalBook
 from .utils.inventory_control import InventoryController
 from .utils.kpi_tracker import KPITracker
-from .data_capture.ws_integration import TradingEngineWSIntegration
+from .data_capture.websocket_manager import TradingEngineWSIntegration
 
 
 @dataclass

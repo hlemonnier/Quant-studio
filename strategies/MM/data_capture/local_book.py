@@ -5,7 +5,6 @@ Objectif: Rejouer snapshot REST + diff stream pour obtenir un L2 propre
 Livrable: classe LocalBook (bid/ask arrays + checksum)
 """
 
-import requests
 import numpy as np
 import pandas as pd
 from typing import Dict, List, Tuple, Optional
@@ -31,9 +30,6 @@ class LocalBook:
         
         # Setup logging
         self.logger = logging.getLogger(f"LocalBook-{symbol}")
-        
-        # URLs Binance
-        self.rest_base_url = "https://api.binance.com"
         
     def initialize_empty_book(self):
         """Initialise un book vide - sera rempli par les WebSocket updates"""
