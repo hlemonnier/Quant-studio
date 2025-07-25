@@ -110,7 +110,7 @@ class LocalBook:
                 if self.get_snapshot():
                     self.logger.info("✅ Resynchronisation réussie, réessai de l'update")
                     # Réessayer l'update après resynchronisation
-                    return self.apply_diff(symbol, diff_data)
+                    return self.apply_diff(diff_data)
                 else:
                     self.logger.error("❌ Échec de la resynchronisation")
                     self.is_synchronized = False
