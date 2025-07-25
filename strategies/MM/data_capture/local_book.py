@@ -23,16 +23,11 @@ class LocalBook:
         self.depth = depth
         self.bids = {}  # {price: quantity}
         self.asks = {}  # {price: quantity}
-        self.last_update_id = 0
-        self.first_update_id = 0
-        self.is_synchronized = False
-        self.last_checksum = None
+        self.is_synchronized = False  # Sera mis à True par initialize_empty_book()
         
         # Métriques et diagnostics
         self.update_count = 0
         self.last_sync_time = None
-        self.sync_errors = 0
-        self.resync_attempts = 0  # Compteur pour éviter les boucles infinies
         
         # Setup logging
         self.logger = logging.getLogger(f"LocalBook-{symbol}")
@@ -40,100 +35,27 @@ class LocalBook:
         # URLs Binance
         self.rest_base_url = "https://api.binance.com"
         
-    def get_snapshot(self) -> bool:
-        """Récupère un snapshot complet via REST API"""
-        try:
-            url = f"{self.rest_base_url}/api/v3/depth"
-            params = {
-                'symbol': self.symbol,
-                'limit': self.depth
-            }
-            
-            response = requests.get(url, params=params, timeout=5)
-            response.raise_for_status()
-            
-            data = response.json()
-            
-            # Initialiser le book
-            self.bids = {float(price): float(qty) for price, qty in data['bids']}
-            self.asks = {float(price): float(qty) for price, qty in data['asks']}
-            self.last_update_id = data['lastUpdateId']
-            self.first_update_id = data['lastUpdateId']
-            
-            self.is_synchronized = True
-            self.last_sync_time = datetime.now()
-            
-            self.logger.info(f"✅ Snapshot récupéré: {len(self.bids)} bids, {len(self.asks)} asks, updateId={self.last_update_id}")
-            return True
-            
-        except Exception as e:
-            self.logger.error(f"❌ Erreur récupération snapshot: {e}")
-            self.sync_errors += 1
-            return False
+    def initialize_empty_book(self):
+        """Initialise un book vide - sera rempli par les WebSocket updates"""
+        self.bids = {}
+        self.asks = {}
+        self.is_synchronized = True  # Toujours synchronisé en mode WebSocket pur
+        self.last_sync_time = datetime.now()
+        self.logger.info(f"✅ LocalBook initialisé en mode WebSocket pur pour {self.symbol}")
+        return True
 
     
     def apply_diff(self, diff_data: dict) -> bool:
-        """Applique un diff WebSocket au book local"""
+        """Applique un diff WebSocket au book local - Version simplifiée"""
         try:
-            # Vérifier la séquence
-            first_update_id = diff_data.get('U')
-            final_update_id = diff_data.get('u')
-            
             # Log des premières applications pour diagnostic
             if self.update_count < 10:
-                self.logger.info(f"🔄 Applying diff #{self.update_count+1} for {self.symbol}: U={first_update_id}, u={final_update_id}")
+                self.logger.info(f"🔄 Applying WebSocket update #{self.update_count+1} for {self.symbol}")
                 self.logger.info(f"📊 Diff data keys: {list(diff_data.keys())}")
                 if 'b' in diff_data:
                     self.logger.info(f"📈 Bids updates: {len(diff_data['b'])} entries")
-                    if diff_data['b']:
-                        self.logger.info(f"📈 First bid update: {diff_data['b'][0]}")
                 if 'a' in diff_data:
                     self.logger.info(f"📉 Asks updates: {len(diff_data['a'])} entries")
-                    if diff_data['a']:
-                        self.logger.info(f"📉 First ask update: {diff_data['a'][0]}")
-            
-            if not self.is_synchronized:
-                self.logger.warning("⚠️  Book non synchronisé, ignoré diff")
-                return False
-            
-            # Vérifier la continuité des updates
-            if first_update_id <= self.last_update_id + 1 <= final_update_id:
-                # Update valide
-                pass
-            elif first_update_id == self.last_update_id + 1:
-                # Update suivant direct
-                pass
-            else:
-                gap_size = first_update_id - (self.last_update_id + 1)
-                self.logger.warning(f"⚠️  Gap détecté: attendu {self.last_update_id + 1}, reçu {first_update_id}-{final_update_id} (gap: {gap_size})")
-                
-                # Protection contre les boucles infinies
-                self.resync_attempts += 1
-                if self.resync_attempts > 3:
-                    self.logger.error(f"❌ Trop de tentatives de resynchronisation ({self.resync_attempts}), abandon du diff")
-                    self.resync_attempts = 0  # Reset pour les prochains diffs
-                    return False
-                
-                # Ignorer les diffs trop anciens (gap > 10000)
-                if gap_size > 10000:
-                    self.logger.warning(f"⚠️  Diff trop ancien (gap: {gap_size}), ignoré")
-                    self.resync_attempts = 0  # Reset car on abandonne
-                    return False
-                
-                self.logger.info(f"🔄 Tentative de resynchronisation automatique #{self.resync_attempts}...")
-                
-                # Essayer de resynchroniser automatiquement
-                if self.get_snapshot():
-                    self.logger.info("✅ Resynchronisation réussie, réessai de l'update")
-                    # Réessayer l'update après resynchronisation
-                    result = self.apply_diff(diff_data)
-                    if result:
-                        self.resync_attempts = 0  # Reset si succès
-                    return result
-                else:
-                    self.logger.error("❌ Échec de la resynchronisation")
-                    self.is_synchronized = False
-                    return False
             
             # Appliquer les modifications bids
             for price_str, qty_str in diff_data.get('b', []):
@@ -159,10 +81,8 @@ class LocalBook:
                     # Mettre à jour/ajouter le niveau
                     self.asks[price] = qty
             
-            # Mettre à jour l'ID
-            self.last_update_id = final_update_id
+            # Incrémenter le compteur d'updates
             self.update_count += 1
-            self.resync_attempts = 0  # Reset compteur après succès
             
             # Nettoyer le book (garder seulement les meilleurs niveaux)
             self._trim_book()
