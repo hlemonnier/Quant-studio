@@ -18,7 +18,7 @@ from pathlib import Path
 import time
 from typing import Dict, List, Optional, Callable
 import logging
-from .config import mm_config
+from ..utils.config import mm_config
 
 class BinanceWSCapture:
     """Capture WebSocket des données depth20 Binance"""

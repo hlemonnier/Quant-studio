@@ -16,7 +16,7 @@ from typing import Dict, Optional, Tuple
 from datetime import datetime
 import logging
 
-from .config import mm_config
+from ..utils.config import mm_config
 from .avellaneda_stoikov import AvellanedaStoikovQuoter
 
 

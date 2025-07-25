@@ -17,7 +17,7 @@ from time import time
 import numpy as np
 import math
 import logging
-from .config import mm_config
+from ..utils.config import mm_config
 
 
 @dataclass

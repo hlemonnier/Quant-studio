@@ -16,7 +16,7 @@ from typing import Dict, Optional, Set, Tuple
 from enum import Enum
 import logging
 
-from .config import mm_config
+from ..utils.config import mm_config
 
 
 class QuoteState(Enum):
@@ -362,4 +362,3 @@ def test_quote_manager():
 
 if __name__ == "__main__":
     test_quote_manager()
-
