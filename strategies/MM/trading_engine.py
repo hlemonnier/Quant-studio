@@ -241,7 +241,7 @@ class TradingEngine:
         # Get real-time mid price from local book (updated by WebSocket)
         new_mid = self.local_book.get_mid_price()
         
-        if new_mid > 0:
+        if new_mid is not None and new_mid > 0:
             # Update mid price with real market data
             self.current_mid = new_mid
             
