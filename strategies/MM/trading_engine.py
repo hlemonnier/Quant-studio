@@ -18,16 +18,16 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 import numpy as np
 
-from .config import mm_config
-from .avellaneda_stoikov import AvellanedaStoikovQuoter
-from .avellaneda_stoikov_v15 import AvellanedaStoikovV15Quoter
-from .ofi import OFICalculator
-from .depth_imbalance import DepthImbalanceCalculator
-from .quote_manager import QuoteManager
-from .local_book import LocalBook
-from .inventory_control import InventoryController
-from .kpi_tracker import KPITracker
-from .ws_integration import TradingEngineWSIntegration
+from .utils.config import mm_config
+from .market_making.avellaneda_stoikov import AvellanedaStoikovQuoter
+from .market_making.avellaneda_stoikov_v15 import AvellanedaStoikovV15Quoter
+from .core.ofi import OFICalculator
+from .core.depth_imbalance import DepthImbalanceCalculator
+from .market_making.quote_manager import QuoteManager
+from .data_capture.local_book import LocalBook
+from .utils.inventory_control import InventoryController
+from .utils.kpi_tracker import KPITracker
+from .data_capture.ws_integration import TradingEngineWSIntegration
 
 
 @dataclass

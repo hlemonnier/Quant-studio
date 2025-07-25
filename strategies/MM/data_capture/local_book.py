@@ -13,7 +13,7 @@ import time
 import logging
 from datetime import datetime
 import hashlib
-from .config import mm_config
+from ..utils.config import mm_config
 
 class LocalBook:
     """Order Book local avec synchronisation REST + WebSocket"""
@@ -76,6 +76,10 @@ class LocalBook:
             # Vérifier la séquence
             first_update_id = diff_data.get('U')
             final_update_id = diff_data.get('u')
+            
+            # Log des premières applications pour diagnostic
+            if self.update_count < 5:
+                self.logger.info(f"🔄 Applying diff #{self.update_count+1} for {self.symbol}: U={first_update_id}, u={final_update_id}")
             
             if not self.is_synchronized:
                 self.logger.warning("⚠️  Book non synchronisé, ignoré diff")
@@ -326,6 +330,23 @@ class LocalBook:
             self.logger.info("🔄 Re-synchronisation du book...")
             return self.get_snapshot()
         return True
+    
+    def apply_ws_update(self, symbol: str, diff_data: dict) -> bool:
+        """Applique une mise à jour WebSocket (wrapper pour apply_diff)"""
+        # Vérifier que le symbole correspond
+        if symbol.upper() != self.symbol:
+            self.logger.warning(f"⚠️ Symbol mismatch: expected {self.symbol}, got {symbol}")
+            return False
+        
+        # Appliquer la mise à jour
+        success = self.apply_diff(diff_data)
+        
+        if success:
+            # Log périodique des mises à jour
+            if self.update_count % 100 == 0:
+                self.logger.debug(f"✅ {self.symbol}: {self.update_count} WebSocket updates applied")
+        
+        return success
 
 class MultiBookManager:
     """Gestionnaire de plusieurs order books"""

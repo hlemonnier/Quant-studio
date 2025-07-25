@@ -39,10 +39,10 @@ repo_root = pathlib.Path(__file__).resolve().parents[2]
 if str(repo_root) not in sys.path:
     sys.path.append(str(repo_root))
 
-from strategies.MM.config import mm_config
+from strategies.MM.utils.config import mm_config
 from strategies.MM.trading_engine import TradingEngine
 from strategies.MM.simple_backtest import run_simple_backtest
-from strategies.MM.parameter_calibration import ParameterCalibrator, generate_synthetic_calibration_data
+from strategies.MM.utils.parameter_calibration import ParameterCalibrator, generate_synthetic_calibration_data
 
 
 def setup_logging(level: str = "INFO"):

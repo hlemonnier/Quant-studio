@@ -96,7 +96,13 @@ class WSLocalBookIntegration:
         try:
             symbol = depth_data.get('symbol')
             if not symbol or symbol not in self.local_books:
+                self.logger.warning(f"⚠️ Received data for unknown symbol: {symbol}")
                 return
+            
+            # Log des premières mises à jour pour diagnostic
+            if self.update_counts[symbol] < 5:
+                self.logger.info(f"🔄 Processing WebSocket update #{self.update_counts[symbol]+1} for {symbol}")
+                self.logger.debug(f"Raw data: {depth_data}")
             
             # Convertir les données au format attendu par LocalBook.apply_diff()
             diff_data = self._convert_to_diff_format(depth_data)
@@ -109,14 +115,19 @@ class WSLocalBookIntegration:
                 
                 # Log périodique des mises à jour
                 if self.update_counts[symbol] % 100 == 0:
-                    self.logger.debug(f"✅ {symbol}: {self.update_counts[symbol]} updates applied")
+                    self.logger.info(f"✅ {symbol}: {self.update_counts[symbol]} updates applied successfully")
+                elif self.update_counts[symbol] <= 5:
+                    self.logger.info(f"✅ {symbol}: Update #{self.update_counts[symbol]} applied successfully")
             else:
                 self.error_counts[symbol] += 1
+                self.logger.warning(f"❌ {symbol}: Failed to apply update #{self.error_counts[symbol]}")
                 if self.error_counts[symbol] % 10 == 0:
-                    self.logger.warning(f"⚠️ {symbol}: {self.error_counts[symbol]} update errors")
+                    self.logger.warning(f"⚠️ {symbol}: {self.error_counts[symbol]} update errors total")
                     
         except Exception as e:
             self.logger.error(f"❌ Error processing depth update: {e}")
+            import traceback
+            self.logger.error(f"Traceback: {traceback.format_exc()}")
     
     def _convert_to_diff_format(self, depth_data: dict) -> dict:
         """Convertit les données WebSocket au format diff attendu par LocalBook"""
