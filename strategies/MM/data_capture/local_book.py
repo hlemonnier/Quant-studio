@@ -32,6 +32,7 @@ class LocalBook:
         self.update_count = 0
         self.last_sync_time = None
         self.sync_errors = 0
+        self.resync_attempts = 0  # Compteur pour éviter les boucles infinies
         
         # Setup logging
         self.logger = logging.getLogger(f"LocalBook-{symbol}")
@@ -103,14 +104,32 @@ class LocalBook:
                 # Update suivant direct
                 pass
             else:
-                self.logger.warning(f"⚠️  Gap détecté: attendu {self.last_update_id + 1}, reçu {first_update_id}-{final_update_id}")
-                self.logger.info("🔄 Tentative de resynchronisation automatique...")
+                gap_size = first_update_id - (self.last_update_id + 1)
+                self.logger.warning(f"⚠️  Gap détecté: attendu {self.last_update_id + 1}, reçu {first_update_id}-{final_update_id} (gap: {gap_size})")
+                
+                # Protection contre les boucles infinies
+                self.resync_attempts += 1
+                if self.resync_attempts > 3:
+                    self.logger.error(f"❌ Trop de tentatives de resynchronisation ({self.resync_attempts}), abandon du diff")
+                    self.resync_attempts = 0  # Reset pour les prochains diffs
+                    return False
+                
+                # Ignorer les diffs trop anciens (gap > 10000)
+                if gap_size > 10000:
+                    self.logger.warning(f"⚠️  Diff trop ancien (gap: {gap_size}), ignoré")
+                    self.resync_attempts = 0  # Reset car on abandonne
+                    return False
+                
+                self.logger.info(f"🔄 Tentative de resynchronisation automatique #{self.resync_attempts}...")
                 
                 # Essayer de resynchroniser automatiquement
                 if self.get_snapshot():
                     self.logger.info("✅ Resynchronisation réussie, réessai de l'update")
                     # Réessayer l'update après resynchronisation
-                    return self.apply_diff(diff_data)
+                    result = self.apply_diff(diff_data)
+                    if result:
+                        self.resync_attempts = 0  # Reset si succès
+                    return result
                 else:
                     self.logger.error("❌ Échec de la resynchronisation")
                     self.is_synchronized = False
@@ -143,6 +162,7 @@ class LocalBook:
             # Mettre à jour l'ID
             self.last_update_id = final_update_id
             self.update_count += 1
+            self.resync_attempts = 0  # Reset compteur après succès
             
             # Nettoyer le book (garder seulement les meilleurs niveaux)
             self._trim_book()
