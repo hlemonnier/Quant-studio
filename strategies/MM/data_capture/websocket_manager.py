@@ -189,16 +189,23 @@ class TradingEngineWSIntegration:
         
         self.logger.info(f"✅ WebSocket integration active for {self.symbol}")
     
-    def stop_integration(self):
+    async def stop_integration(self):
         """Arrête l'intégration WebSocket"""
         self.logger.info("🛑 Stopping WebSocket integration...")
         
         # Arrêter l'intégration
         self.integration.stop_integration()
         
-        # Annuler la tâche si elle existe
+        # Annuler la tâche si elle existe et attendre qu'elle se termine proprement
         if hasattr(self, 'ws_task') and not self.ws_task.done():
             self.ws_task.cancel()
+            try:
+                await self.ws_task
+            except asyncio.CancelledError:
+                # C'est normal, la tâche a été annulée
+                pass
+            except Exception as e:
+                self.logger.warning(f"⚠️ Error during task cleanup: {e}")
         
         self.logger.info(f"🛑 WebSocket integration stopped for {self.symbol}")
 
@@ -223,4 +230,3 @@ if __name__ == "__main__":
     
     print("🧪 Testing WebSocket Manager...")
     asyncio.run(test_websocket())
-

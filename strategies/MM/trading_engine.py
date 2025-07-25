@@ -125,10 +125,16 @@ class TradingEngine:
             self.logger.error(f"❌ Error in trading loop: {e}")
         finally:
             # Ensure we clean up on exit
-            await self._cancel_all_quotes()
+            try:
+                await self._cancel_all_quotes()
+            except Exception as e:
+                self.logger.warning(f"⚠️ Error cancelling quotes: {e}")
             
             # Stop WebSocket integration
-            await self.ws_integration.stop_integration()
+            try:
+                await self.ws_integration.stop_integration()
+            except Exception as e:
+                self.logger.warning(f"⚠️ Error stopping WebSocket integration: {e}")
             
             self.logger.info("Trading loop stopped")
     
@@ -138,10 +144,16 @@ class TradingEngine:
         self.running = False
         
         # Cancel all active quotes
-        await self._cancel_all_quotes()
+        try:
+            await self._cancel_all_quotes()
+        except Exception as e:
+            self.logger.warning(f"⚠️ Error cancelling quotes: {e}")
         
         # Stop WebSocket integration
-        await self.ws_integration.stop_integration()
+        try:
+            await self.ws_integration.stop_integration()
+        except Exception as e:
+            self.logger.warning(f"⚠️ Error stopping WebSocket integration: {e}")
         
         # Wait a bit to ensure all cancels are processed
         await asyncio.sleep(0.5)
