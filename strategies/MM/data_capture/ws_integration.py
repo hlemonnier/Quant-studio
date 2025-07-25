@@ -145,12 +145,22 @@ class WSLocalBookIntegration:
                 return
             
             # Log des premières mises à jour pour diagnostic
-            if self.update_counts[symbol] < 5:
+            if self.update_counts[symbol] < 10:
                 self.logger.info(f"🔄 Processing WebSocket update #{self.update_counts[symbol]+1} for {symbol}")
-                self.logger.debug(f"Raw data: {depth_data}")
+                self.logger.info(f"📊 Raw WebSocket data keys: {list(depth_data.keys())}")
+                if 'bids' in depth_data and 'asks' in depth_data:
+                    self.logger.info(f"📈 Bids count: {len(depth_data.get('bids', []))}, Asks count: {len(depth_data.get('asks', []))}")
+                    if depth_data.get('bids'):
+                        self.logger.info(f"📈 First bid: {depth_data['bids'][0]}")
+                    if depth_data.get('asks'):
+                        self.logger.info(f"📉 First ask: {depth_data['asks'][0]}")
             
             # Convertir les données au format attendu par LocalBook.apply_diff()
             diff_data = self._convert_to_diff_format(depth_data)
+            
+            # Log du format converti
+            if self.update_counts[symbol] < 5:
+                self.logger.info(f"🔄 Converted diff data keys: {list(diff_data.keys())}")
             
             # Appliquer la mise à jour au local book
             success = self.local_books[symbol].apply_ws_update(symbol, diff_data)
