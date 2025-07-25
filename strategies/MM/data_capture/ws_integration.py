@@ -93,8 +93,19 @@ class BinanceDepthStreamCapture:
     def _process_depth_data(self, data: dict) -> Optional[dict]:
         """Traite les données WebSocket pour extraire le symbole"""
         try:
+            # Format Binance depth update direct (le plus courant)
+            if 'e' in data and data.get('e') == 'depthUpdate' and 's' in data:
+                # Données directes de Binance avec symbole inclus
+                symbol = data.get('s', '').upper()
+                if symbol in [s.upper() for s in self.symbols]:
+                    data['symbol'] = symbol
+                    return data
+                else:
+                    self.logger.warning(f"⚠️ Received data for unknown symbol: {symbol}")
+                    return None
+            
             # Format stream combiné avec identifiant
-            if 'stream' in data and 'data' in data:
+            elif 'stream' in data and 'data' in data:
                 stream_name = data.get('stream', '')
                 symbol = stream_name.split('@')[0].upper()
                 depth_data = data.get('data', {})
@@ -103,7 +114,7 @@ class BinanceDepthStreamCapture:
                 depth_data['symbol'] = symbol
                 return depth_data
             
-            # Format stream direct - identifier par prix
+            # Format stream direct - identifier par prix (fallback)
             elif 'bids' in data and 'asks' in data:
                 bids = data.get('bids', [])
                 asks = data.get('asks', [])
@@ -126,7 +137,10 @@ class BinanceDepthStreamCapture:
                     data['symbol'] = symbol
                     return data
             
-            return None
+            # Format non reconnu
+            else:
+                self.logger.warning(f"⚠️ Unknown data format, keys: {list(data.keys())}")
+                return None
             
         except Exception as e:
             self.logger.error(f"❌ Error processing depth data: {e}")
