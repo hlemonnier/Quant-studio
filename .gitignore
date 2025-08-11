@@ -3,3 +3,4 @@ __pycache__
 backtesting_result
 venv
 model.sql
+.idea

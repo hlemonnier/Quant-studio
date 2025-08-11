@@ -12,11 +12,11 @@ import logging
 # Configuration du logging
 logging.basicConfig(level=logging.INFO)
 
-from .config import mm_config
-from .avellaneda_stoikov import AvellanedaStoikovQuoter
-from .kpi_tracker import KPITracker
-from .performance_validator import PerformanceValidator
-from .inventory_control import InventoryController
+from .utils.config import mm_config
+from .market_making.avellaneda_stoikov import AvellanedaStoikovQuoter
+from .utils.kpi_tracker import KPITracker
+from .utils.performance_validator import PerformanceValidator
+from .utils.inventory_control import InventoryController
 
 def generate_simple_data(duration_minutes: int = 60) -> pd.DataFrame:
     """Génère des données de marché simples pour test rapide"""

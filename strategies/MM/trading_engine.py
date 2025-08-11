@@ -18,12 +18,16 @@ from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Tuple
 import numpy as np
 
-from .config import mm_config
-from .avellaneda_stoikov import AvellanedaStoikovQuoter
-from .ofi import OFICalculator
-from .local_book import LocalBook
-from .inventory_control import InventoryController
-from .kpi_tracker import KPITracker
+from .utils.config import mm_config
+from .market_making.avellaneda_stoikov import AvellanedaStoikovQuoter
+from .market_making.avellaneda_stoikov_v15 import AvellanedaStoikovV15Quoter
+from .core.ofi import OFICalculator
+from .core.depth_imbalance import DepthImbalanceCalculator
+from .market_making.quote_manager import QuoteManager
+from .data_capture.local_book import LocalBook
+from .utils.inventory_control import InventoryController
+from .utils.kpi_tracker import KPITracker
+from .data_capture.websocket_manager import TradingEngineWSIntegration
 
 
 @dataclass
@@ -49,18 +53,30 @@ class Fill:
 
 
 class TradingEngine:
-    """Main V1 trading engine integrating all components"""
+    """Main trading engine supporting both V1-α and V1.5"""
     
-    def __init__(self, symbol: str):
+    def __init__(self, symbol: str, version: str = "V1-α"):
         self.symbol = symbol
-        self.logger = logging.getLogger(f"TradingEngine-{symbol}")
+        self.version = version
+        self.logger = logging.getLogger(f"TradingEngine-{symbol}-{version}")
         
-        # Core components
-        self.quoter = AvellanedaStoikovQuoter(symbol)
+        # Core components (common to both versions)
         self.ofi_calc = OFICalculator(symbol)
         self.local_book = LocalBook(symbol)
         self.inventory_ctrl = InventoryController(symbol)
         self.kpi_tracker = KPITracker(symbol)
+        
+        # Version-specific components
+        if version == "V1.5":
+            self.quoter = AvellanedaStoikovV15Quoter(symbol)
+            self.di_calc = DepthImbalanceCalculator(symbol)
+            self.quote_manager = QuoteManager(symbol)
+            self.logger.warning("🚀 V1.5 Enhanced Trading Engine initialized")
+        else:
+            self.quoter = AvellanedaStoikovQuoter(symbol)
+            self.di_calc = None
+            self.quote_manager = None
+            self.logger.warning("🚀 V1-α Trading Engine initialized")
         
         # Trading state
         self.active_quotes: Dict[str, Quote] = {}
@@ -77,6 +93,10 @@ class TradingEngine:
         # Performance tracking
         self.total_quotes_sent = 0
         self.total_fills = 0
+        
+        # WebSocket integration for real-time data
+        self.ws_integration = TradingEngineWSIntegration(self)
+        # WebSocket integration initialized silently
         self.session_start = time.time()
         
         # Control flag for trading loop
@@ -84,7 +104,7 @@ class TradingEngine:
         
     async def run_trading_loop(self):
         """Main entry point to run the trading loop"""
-        self.logger.info(f"🚀 Starting trading loop for {self.symbol}")
+        # Trading loop starting silently
         self.running = True
         
         try:
@@ -92,6 +112,9 @@ class TradingEngine:
             if not await self._initialize_market_data():
                 self.logger.error("❌ Failed to initialize market data")
                 return
+            
+            # Start WebSocket integration for real-time updates
+            await self.ws_integration.start_integration()
             
             # Run main trading loop
             await self._main_trading_loop()
@@ -102,7 +125,17 @@ class TradingEngine:
             self.logger.error(f"❌ Error in trading loop: {e}")
         finally:
             # Ensure we clean up on exit
-            await self._cancel_all_quotes()
+            try:
+                await self._cancel_all_quotes()
+            except Exception as e:
+                self.logger.warning(f"⚠️ Error cancelling quotes: {e}")
+            
+            # Stop WebSocket integration
+            try:
+                await self.ws_integration.stop_integration()
+            except Exception as e:
+                self.logger.warning(f"⚠️ Error stopping WebSocket integration: {e}")
+            
             self.logger.info("Trading loop stopped")
     
     async def stop(self):
@@ -111,7 +144,16 @@ class TradingEngine:
         self.running = False
         
         # Cancel all active quotes
-        await self._cancel_all_quotes()
+        try:
+            await self._cancel_all_quotes()
+        except Exception as e:
+            self.logger.warning(f"⚠️ Error cancelling quotes: {e}")
+        
+        # Stop WebSocket integration
+        try:
+            await self.ws_integration.stop_integration()
+        except Exception as e:
+            self.logger.warning(f"⚠️ Error stopping WebSocket integration: {e}")
         
         # Wait a bit to ensure all cancels are processed
         await asyncio.sleep(0.5)
@@ -135,15 +177,20 @@ class TradingEngine:
     async def _initialize_market_data(self) -> bool:
         """Initialize connection to market data"""
         try:
-            # Get initial snapshot
-            if not self.local_book.get_snapshot():
+            # Initialize empty book (WebSocket-only mode)
+            if not self.local_book.initialize_empty_book():
                 return False
+            
+            # Wait 2 seconds for WebSocket data to populate the book
+            # Wait 2s for WebSocket data to populate book
+            await asyncio.sleep(2.0)
             
             self.current_mid = self.local_book.get_mid_price()
             if not self.current_mid:
-                return False
+                self.logger.warning("⚠️ No mid price yet, will update when WebSocket data arrives")
+                self.current_mid = 0  # Will be updated by WebSocket
                 
-            self.logger.info(f"✅ Initialized: Mid=${self.current_mid:.2f}")
+            # Initialized silently
             return True
             
         except Exception as e:
@@ -152,7 +199,7 @@ class TradingEngine:
     
     async def _main_trading_loop(self):
         """Main trading loop implementing §3.5"""
-        self.logger.info("🔄 Starting main trading loop")
+        # Main trading loop starting
         
         while self.running:
             try:
@@ -202,18 +249,17 @@ class TradingEngine:
                 await asyncio.sleep(1.0)
     
     async def _update_market_data(self):
-        """Update market data from local book"""
-        # In a real implementation, this would process WebSocket updates
-        # For now, we simulate market movement
+        """Update market data from local book (now with real WebSocket data!)"""
+        # Get real-time mid price from local book (updated by WebSocket)
+        new_mid = self.local_book.get_mid_price()
         
-        # Update mid price (simulate small random walk)
-        if self.current_mid > 0:
-            change_pct = np.random.normal(0, 0.0001)  # 0.01% std dev
-            self.current_mid *= (1 + change_pct)
+        if new_mid is not None and new_mid > 0:
+            # Update mid price with real market data
+            self.current_mid = new_mid
             
-            # Simuler la latence mid-price (§3.2 V1-α)
-            # En mode simulation, on génère une latence aléatoire
-            self.last_mid_price_latency_ms = np.random.uniform(10, 80)  # 10-80ms
+            # Calculate real latency from WebSocket integration
+            # For now, use a small simulated latency as placeholder
+            self.last_mid_price_latency_ms = np.random.uniform(10, 50)  # 10-50ms
             
             # Update quoter's price history for volatility estimation
             self.quoter.update_volatility(self.current_mid)
@@ -224,6 +270,12 @@ class TradingEngine:
             
             # CORRIGÉ: Mettre à jour aussi l'InventoryController avec le prix mid
             self.inventory_ctrl.update_mid_price(self.current_mid)
+            
+            # V1.5: Update Depth Imbalance if available
+            if self.version == "V1.5" and self.di_calc:
+                # Get L1-L5 depth data from local book
+                bid_depth, ask_depth = self.local_book.get_depth_l1_l5_both()
+                self.di_calc.update_depth(bid_depth, ask_depth)
     
     def _check_risk_controls(self) -> Tuple[bool, str]:
         """Check all risk controls from §3.6"""
@@ -255,37 +307,72 @@ class TradingEngine:
         return False, ""
     
     async def _compute_quotes(self) -> Optional[Dict]:
-        """Compute optimal quotes using A&S + OFI"""
+        """Compute optimal quotes using version-specific logic"""
         if self.current_mid <= 0:
             return None
         
         try:
-            # Get current OFI signal
+            # Get current signals
             current_ofi = self.ofi_calc.current_ofi()
+            current_inventory = self.inventory_ctrl.current_inventory
             
-            # Get current inventory
-            inventory = self.inventory_ctrl.current_inventory
+            # Version-specific quote computation
+            if self.version == "V1.5":
+                quotes = await self._compute_quotes_v15(current_ofi, current_inventory)
+            else:
+                quotes = await self._compute_quotes_v1_alpha(current_ofi, current_inventory)
             
-            # Compute quotes
-            quotes = self.quoter.compute_quotes(
-                mid_price=self.current_mid,
-                inventory=inventory,
-                ofi=current_ofi
-            )
+            if not quotes:
+                return None
             
-            # Apply inventory skew
+            # Apply inventory skew (common to both versions)
             skewed_quotes = self.inventory_ctrl.apply_skew_to_quotes(quotes)
             
-            # Validate quotes
-            if not self.quoter.validate_quotes(skewed_quotes, self.current_mid):
-                self.logger.warning("⚠️  Invalid quotes generated")
-                return None
+            # Version-specific validation
+            if self.version == "V1.5":
+                if not self.quoter.validate_quotes_v15(skewed_quotes):
+                    self.logger.warning("⚠️  Invalid V1.5 quotes generated")
+                    return None
+            else:
+                if not self.quoter.validate_quotes(skewed_quotes, self.current_mid):
+                    self.logger.warning("⚠️  Invalid V1-α quotes generated")
+                    return None
             
             return skewed_quotes
             
         except Exception as e:
             self.logger.error(f"❌ Error computing quotes: {e}")
             return None
+    
+    async def _compute_quotes_v1_alpha(self, ofi: float, inventory: float) -> Optional[Dict]:
+        """Compute V1-α quotes (original logic)"""
+        quotes = self.quoter.compute_quotes(
+            mid_price=self.current_mid,
+            inventory=inventory,
+            ofi=ofi
+        )
+        return quotes
+    
+    async def _compute_quotes_v15(self, ofi: float, inventory: float) -> Optional[Dict]:
+        """Compute V1.5 quotes with enhanced multi-signal approach"""
+        # Get current DI signal
+        current_di = self.di_calc.get_current_di() if self.di_calc else 0.0
+        
+        # Check if quote refresh is needed (ageing or signal change)
+        if self.quote_manager:
+            refresh_needed, reason = self.quote_manager.check_refresh_needed(ofi, current_di)
+            if refresh_needed:
+                self.logger.debug(f"🔄 Quote refresh triggered: {reason}")
+        
+        # Compute V1.5 quotes with multi-signal approach
+        quotes = self.quoter.compute_quotes_v15(
+            mid_price=self.current_mid,
+            inventory=inventory,
+            ofi=ofi,
+            di=current_di
+        )
+        
+        return quotes
     
     async def _update_quotes(self, quotes_data: Dict):
         """Update quotes in the market (simulated)"""
@@ -325,6 +412,18 @@ class TradingEngine:
             self.active_quotes[bid_id] = bid_quote
             self.active_quotes[ask_id] = ask_quote
             
+            # V1.5: Add quotes to quote manager for ageing tracking
+            if self.version == "V1.5" and self.quote_manager:
+                current_ofi = quotes_data.get('ofi', 0.0)
+                current_di = quotes_data.get('di', 0.0)
+                
+                self.quote_manager.add_quote(
+                    bid_id, 'bid', bid_quote.price, bid_quote.size, current_ofi, current_di
+                )
+                self.quote_manager.add_quote(
+                    ask_id, 'ask', ask_quote.price, ask_quote.size, current_ofi, current_di
+                )
+            
             self.total_quotes_sent += 2
             self.last_quote_time = current_time
             
@@ -335,12 +434,21 @@ class TradingEngine:
             ack_latency = np.random.normal(50, 20)  # 50ms ± 20ms
             self.kpi_tracker.record_latency('quote_ack', max(10, ack_latency))
             
-            # Log quote update
-            self.logger.debug(f"📊 Quotes updated: "
-                             f"Bid ${bid_quote.price:.2f}@{bid_quote.size:.4f} | "
-                             f"Ask ${ask_quote.price:.2f}@{ask_quote.size:.4f} | "
-                             f"OFI: {quotes_data.get('ofi', 0):.3f} | "
-                             f"Shift: {quotes_data.get('center_shift', 0):.6f}")
+            # Enhanced logging for V1.5
+            if self.version == "V1.5":
+                self.logger.debug(f"📊 V1.5 Quotes updated: "
+                                 f"Bid ${bid_quote.price:.2f}@{bid_quote.size:.4f} | "
+                                 f"Ask ${ask_quote.price:.2f}@{ask_quote.size:.4f} | "
+                                 f"OFI: {quotes_data.get('ofi', 0):.3f} | "
+                                 f"DI: {quotes_data.get('di', 0):.3f} | "
+                                 f"Centre: ${quotes_data.get('centre_price', 0):.2f} | "
+                                 f"Dynamic Spread: {quotes_data.get('spread_bps', 0):.1f}bps")
+            else:
+                self.logger.debug(f"📊 V1-α Quotes updated: "
+                                 f"Bid ${bid_quote.price:.2f}@{bid_quote.size:.4f} | "
+                                 f"Ask ${ask_quote.price:.2f}@{ask_quote.size:.4f} | "
+                                 f"OFI: {quotes_data.get('ofi', 0):.3f} | "
+                                 f"Shift: {quotes_data.get('center_shift', 0):.6f}")
             
         except Exception as e:
             self.logger.error(f"❌ Error updating quotes: {e}")
@@ -430,11 +538,12 @@ class TradingEngine:
             self.logger.error(f"❌ Error processing fill: {e}")
     
     def get_status(self) -> Dict:
-        """Get current trading status"""
+        """Get current trading status with version-specific information"""
         uptime = time.time() - self.session_start
         
-        return {
+        base_status = {
             'symbol': self.symbol,
+            'version': self.version,
             'status': 'PAUSED' if self.trading_paused else 'ACTIVE',
             'pause_reason': self.pause_reason,
             'uptime_minutes': uptime / 60,
@@ -447,14 +556,25 @@ class TradingEngine:
             'current_ofi': self.ofi_calc.current_ofi(),
             'kpis': self.kpi_tracker.get_summary()
         }
+        
+        # Add V1.5 specific status information
+        if self.version == "V1.5":
+            base_status.update({
+                'current_di': self.di_calc.get_current_di() if self.di_calc else 0.0,
+                'di_stats': self.di_calc.get_signal_stats() if self.di_calc else {},
+                'quote_manager_stats': self.quote_manager.get_management_stats() if self.quote_manager else {},
+                'v15_params': self.quoter.get_v15_params() if hasattr(self.quoter, 'get_v15_params') else {}
+            })
+        
+        return base_status
     
     def print_status(self):
-        """Print current status"""
+        """Print current status with version-specific details"""
         status = self.get_status()
         kpis = status['kpis']
         
-        print(f"\n📊 {self.symbol} Trading Engine Status")
-        print("=" * 50)
+        print(f"\n📊 {self.symbol} Trading Engine Status ({status['version']})")
+        print("=" * 60)
         print(f"Status: {status['status']} | Uptime: {status['uptime_minutes']:.1f}min")
         if status['pause_reason']:
             print(f"Pause Reason: {status['pause_reason']}")
@@ -462,15 +582,51 @@ class TradingEngine:
         print(f"Inventory: {status['inventory']:+.4f}")
         print(f"Volatility: {status['current_volatility']:.4f}")
         print(f"OFI: {status['current_ofi']:+.3f}")
+        
+        # V1.5 specific signals
+        if status['version'] == "V1.5":
+            print(f"DI: {status['current_di']:+.3f}")
+            
+            # Quote manager stats
+            qm_stats = status.get('quote_manager_stats', {})
+            if qm_stats:
+                print(f"Quote Ageing: {qm_stats.get('aged_out', 0)} aged out, "
+                      f"{qm_stats.get('signal_refreshed', 0)} signal refreshed")
+        
+        # WebSocket integration stats
+        ws_stats = self.ws_integration.get_integration_stats()
+        if ws_stats:
+            print(f"WebSocket Updates: {ws_stats.get('updates', 0)} received, "
+                  f"{ws_stats.get('errors', 0)} errors "
+                  f"({ws_stats.get('success_rate', 0):.1f}% success)")
+        
         print(f"Quotes Sent: {status['total_quotes']} | Fills: {status['total_fills']}")
         print(f"Active Quotes: {status['active_quotes']}")
+        
         print("\n📈 KPIs:")
         print(f"  Fill Ratio: {kpis.get('fill_ratio', 0):.2%}")
         print(f"  Cancel Ratio: {kpis.get('cancel_ratio', 0):.2%}")
         print(f"  Avg Spread Captured: {kpis.get('avg_spread_captured', 0):.4f}")
         print(f"  RMS Inventory: {kpis.get('rms_inventory', 0):.4f}")
         print(f"  Total PnL: ${kpis.get('total_pnl', 0):+.2f}")
-        print("=" * 50)
+        
+        # V1.5 specific KPIs
+        if status['version'] == "V1.5":
+            di_stats = status.get('di_stats', {})
+            if di_stats:
+                print(f"\n🔬 V1.5 Signal Stats:")
+                print(f"  DI Observations: {di_stats.get('n_observations', 0)}")
+                print(f"  DI Mean: {di_stats.get('mean', 0):.4f}")
+                print(f"  DI Std: {di_stats.get('std', 0):.4f}")
+            
+            v15_params = status.get('v15_params', {})
+            if v15_params:
+                print(f"\n⚙️  V1.5 Parameters:")
+                print(f"  β_di: {v15_params.get('beta_di', 0):.3f}")
+                print(f"  κ_inv: {v15_params.get('kappa_inv', 0):.3f}")
+                print(f"  κ_vol: {v15_params.get('kappa_vol', 0):.3f}")
+        
+        print("=" * 60)
 
 
 # Test function

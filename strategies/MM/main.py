@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 """
-Market Making V1 - Main Entry Point (Version 2)
+Market Making V1.5 - Main Entry Point
 
-Version améliorée avec support multi-symboles et meilleure gestion du PnL.
+Enhanced version with V1.5 support including:
+- Depth Imbalance (DI) signal integration
+- Quote ageing system
+- Enhanced multi-signal pricing
+- Version selection support
 
 Usage:
-    python strategies/MM/main.py --mode=paper-trading
-    python strategies/MM/main.py --mode=paper-trading --symbol=all
-    python strategies/MM/main.py --mode=paper-trading --symbol=ETHUSDT
+    python strategies/MM/main.py --mode=paper-trading --version=V1.5
+    python strategies/MM/main.py --mode=paper-trading --version=V1-α
+    python strategies/MM/main.py --mode=paper-trading --symbol=all --version=V1.5
     python strategies/MM/main.py --mode=backtest
     python strategies/MM/main.py --mode=calibration
 
@@ -16,6 +20,10 @@ Modes:
 - backtest: Historical validation
 - calibration: Parameter optimization
 - live: Real trading (requires API keys)
+
+Versions:
+- V1-α: Original Avellaneda-Stoikov with OFI
+- V1.5: Enhanced with DI, quote ageing, and dynamic spread
 """
 
 import sys
@@ -31,34 +39,55 @@ repo_root = pathlib.Path(__file__).resolve().parents[2]
 if str(repo_root) not in sys.path:
     sys.path.append(str(repo_root))
 
-from strategies.MM.config import mm_config
+from strategies.MM.utils.config import mm_config
 from strategies.MM.trading_engine import TradingEngine
 from strategies.MM.simple_backtest import run_simple_backtest
-from strategies.MM.parameter_calibration import ParameterCalibrator, generate_synthetic_calibration_data
+from strategies.MM.utils.parameter_calibration import ParameterCalibrator, generate_synthetic_calibration_data
 
 
-def setup_logging(level: str = "INFO"):
+def setup_logging(level: str = "WARNING"):
     """Configure logging for the market making system"""
     pathlib.Path('logs').mkdir(exist_ok=True)
+    
+    # Format plus propre pour le trading (sans timestamp pour console)
+    console_format = '%(levelname)s:%(name)s:%(message)s'
+    file_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    
+    # Si niveau WARNING ou plus élevé, format encore plus propre
+    if level.upper() in ['WARNING', 'ERROR']:
+        console_format = '%(message)s'
+    
     logging.basicConfig(
         level=getattr(logging, level.upper()),
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        format=console_format,
         handlers=[
             logging.StreamHandler(sys.stdout),
-            logging.FileHandler(f'logs/mm_v1_{datetime.now().strftime("%Y%m%d")}.log', mode='a')
+            logging.FileHandler(f'logs/mm_{datetime.now().strftime("%Y%m%d")}.log', mode='a')
         ]
     )
+    
+    # Le fichier garde toujours le format complet
+    file_handler = logging.FileHandler(f'logs/mm_{datetime.now().strftime("%Y%m%d")}.log', mode='a')
+    file_handler.setFormatter(logging.Formatter(file_format))
+    
+    # Remplacer le handler de fichier
+    root_logger = logging.getLogger()
+    for handler in root_logger.handlers[:]:
+        if isinstance(handler, logging.FileHandler):
+            root_logger.removeHandler(handler)
+    root_logger.addHandler(file_handler)
 
 
-async def run_paper_trading(symbols: List[str], duration_hours: Optional[int] = None):
+async def run_paper_trading(symbols: List[str], duration_hours: Optional[int] = None, version: str = "V1-α"):
     """
-    Run paper trading mode with support for multiple symbols
+    Run paper trading mode with support for multiple symbols and versions
     
     Args:
         symbols: List of symbols to trade
         duration_hours: Optional duration in hours
+        version: Strategy version ("V1-α" or "V1.5")
     """
-    print(f"🚀 Starting Paper Trading for {', '.join(symbols)}")
+    print(f"🚀 Starting Paper Trading {version} for {', '.join(symbols)}")
     print("=" * 60)
     
     # Validate configuration
@@ -66,23 +95,32 @@ async def run_paper_trading(symbols: List[str], duration_hours: Optional[int] = 
         print("❌ Configuration validation failed")
         return
     
+    # Set version in config
+    mm_config.strategy_version = version
     mm_config.print_config()
     
     # Initialize trading engines for each symbol
     engines = []
     for symbol in symbols:
-        print(f"\n📈 Initializing trading engine for {symbol}...")
-        engine = TradingEngine(symbol)
+        print(f"\n📈 Initializing {version} trading engine for {symbol}...")
+        engine = TradingEngine(symbol, version=version)
         engines.append(engine)
     
     try:
         print(f"\n🚀 Starting trading engines...")
         print("💡 Press Ctrl+C to stop gracefully")
-        print("\n⚠️  IMPORTANT: PnL négatif est NORMAL en market making!")
+        print(f"\n⚠️  IMPORTANT: PnL négatif est NORMAL en market making!")
         print("   Le système s'arrêtera seulement si:")
         print(f"   - Perte quotidienne > {mm_config.daily_loss_limit_pct}% (configurable)")
         print("   - Inventaire > limites configurées")
         print("   - Volatilité excessive détectée")
+        
+        if version == "V1.5":
+            print(f"\n🔬 V1.5 Enhanced Features:")
+            print(f"   - Depth Imbalance (DI) signal integration")
+            print(f"   - Quote ageing with {mm_config.quote_ageing_ms}ms timeout")
+            print(f"   - Dynamic spread adjustment")
+            print(f"   - Enhanced risk controls")
         
         # Start all trading loops
         tasks = []
@@ -90,35 +128,54 @@ async def run_paper_trading(symbols: List[str], duration_hours: Optional[int] = 
             tasks.append(asyncio.create_task(engine.run_trading_loop()))
         
         # Wait for all tasks or timeout
-        if duration_hours:
-            print(f"⏱️  Running for {duration_hours} hours")
-            await asyncio.wait_for(
-                asyncio.gather(*tasks),
-                timeout=duration_hours * 3600
-            )
-        else:
-            await asyncio.gather(*tasks)
+        try:
+            if duration_hours:
+                print(f"⏱️  Running for {duration_hours} hours")
+                await asyncio.wait_for(
+                    asyncio.gather(*tasks),
+                    timeout=duration_hours * 3600
+                )
+            else:
+                await asyncio.gather(*tasks)
+        except (KeyboardInterrupt, asyncio.CancelledError):
+            print("\n🛑 Graceful shutdown initiated...")
+            # Cancel all running tasks
+            for task in tasks:
+                if not task.done():
+                    task.cancel()
+            
+            # Wait for all tasks to complete cancellation
+            if tasks:
+                await asyncio.gather(*tasks, return_exceptions=True)
     
-    except KeyboardInterrupt:
-        print("\n🛑 Graceful shutdown initiated...")
     except asyncio.TimeoutError:
         print("\n⏱️  Trading duration completed")
+        # Cancel remaining tasks
+        for task in tasks:
+            if not task.done():
+                task.cancel()
+        if tasks:
+            await asyncio.gather(*tasks, return_exceptions=True)
     except Exception as e:
         print(f"\n❌ Error in trading loop: {e}")
+        # Cancel remaining tasks
+        for task in tasks:
+            if not task.done():
+                task.cancel()
+        if tasks:
+            await asyncio.gather(*tasks, return_exceptions=True)
     finally:
         # Stop all engines
         for engine in engines:
-            await engine.stop()
+            try:
+                await engine.stop()
+            except Exception as e:
+                print(f"⚠️ Error stopping engine {engine.symbol}: {e}")
         
         # Print final summary for each engine
         print("\n📊 Final Summary:")
         for engine in engines:
-            status = engine.get_status()
-            print(f"\n  {engine.symbol}:")
-            print(f"    Total Quotes: {status['total_quotes']}")
-            print(f"    Total Fills: {status['total_fills']}")
-            print(f"    Current Inventory: {status['inventory']:.4f}")
-            print(f"    Total PnL: ${status['kpis'].get('total_pnl', 0):.2f}")
+            engine.print_status()
         
         print("✅ Shutdown complete")
 
@@ -145,33 +202,50 @@ def run_backtest_mode():
         print(f"❌ Backtesting failed: {e}")
 
 
-def run_calibration_mode(symbols: List[str]):
+def run_calibration_mode(symbols: List[str], verbose: bool = False):
     """Run parameter calibration mode for one or several symbols"""
     print("🔧 Starting Parameter Calibration")
     print("=" * 60)
 
-    for sym in symbols:
-        print(f"\n📈 Calibrating parameters for {sym} ...")
-        try:
-            calibrator = ParameterCalibrator(sym)
+    # Temporairement réduire les logs pour la calibration si pas verbose
+    original_levels = {}
+    if not verbose:
+        # Réduire les logs pour tous les calibrateurs
+        for sym in symbols:
+            logger_name = f'ParamCalibrator-{sym}'
+            calibration_logger = logging.getLogger(logger_name)
+            original_levels[logger_name] = calibration_logger.level
+            calibration_logger.setLevel(logging.WARNING)
 
-            # TODO: Replace synthetic generator by real historical data loading
-            market_data, trading_history = generate_synthetic_calibration_data()
+    try:
+        for sym in symbols:
+            print(f"\n📈 Calibrating parameters for {sym} ...")
+            try:
+                calibrator = ParameterCalibrator(sym)
 
-            results = calibrator.run_full_calibration(market_data, trading_history)
+                # TODO: Replace synthetic generator by real historical data loading
+                market_data, trading_history = generate_synthetic_calibration_data()
 
-            print("\n🎯 Calibration Results for", sym)
-            print("=" * 40)
-            for param, value in results.items():
-                print(f"  {param}: {value:.6f}")
-            print("=" * 40)
-            print("✅ Parameters updated and saved for", sym)
+                results = calibrator.run_full_calibration(market_data, trading_history)
 
-        except Exception as e:
-            print(f"❌ Calibration failed for {sym}: {e}")
+                print(f"\n🎯 Calibration Results for {sym}")
+                print("=" * 40)
+                for param, value in results.items():
+                    print(f"  {param}: {value:.6f}")
+                print("=" * 40)
+                print(f"✅ Parameters updated and saved for {sym}")
+
+            except Exception as e:
+                print(f"❌ Calibration failed for {sym}: {e}")
+    
+    finally:
+        # Restaurer le niveau de logging original
+        if not verbose:
+            for logger_name, original_level in original_levels.items():
+                logging.getLogger(logger_name).setLevel(original_level)
 
 
-async def run_live_trading(symbols: List[str]):
+async def run_live_trading(symbols: List[str], version: str = "V1-α"):
     """Run live trading mode (requires API keys)"""
     print("🔴 LIVE TRADING MODE")
     print("=" * 60)
@@ -189,61 +263,69 @@ async def run_live_trading(symbols: List[str]):
         return
     
     print("🚀 Starting live trading...")
-    await run_paper_trading(symbols)  # Uses same engine but with real orders
+    await run_paper_trading(symbols, version=version)  # Uses same engine but with real orders
 
 
 def main():
     """Main entry point"""
-    parser = argparse.ArgumentParser(description='Market Making V1 Strategy')
+    parser = argparse.ArgumentParser(description='Market Making Strategy with V1.5 Support')
     parser.add_argument('--mode', 
                        choices=['paper-trading', 'backtest', 'calibration', 'live'],
                        default='paper-trading',
-                       help='Trading mode to run')
-    parser.add_argument('--symbol', default='BTCUSDT', 
-                       help='Symbol to trade (use "all" for all configured symbols)')
-    parser.add_argument('--duration', type=int, help='Duration in hours for paper trading')
-    parser.add_argument('--log-level', default='INFO', help='Logging level')
+                       help='Trading mode')
+    parser.add_argument('--version',
+                       choices=['V1-α', 'V1.5'],
+                       default='V1-α',
+                       help='Strategy version (V1-α or V1.5)')
+    parser.add_argument('--symbol', 
+                       default='BTCUSDT',
+                       help='Symbol to trade (or "all" for all configured symbols)')
+    parser.add_argument('--duration', 
+                       type=int,
+                       help='Duration in hours (for paper trading)')
+    parser.add_argument('--log-level',
+                       choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'],
+                       default='WARNING',
+                       help='Logging level (default: WARNING for clean trading output)')
     
     args = parser.parse_args()
     
     # Setup logging
-    pathlib.Path('logs').mkdir(exist_ok=True)
     setup_logging(args.log_level)
     
-    print("🤖 Market Making V1 Strategy")
-    print(f"📅 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"🎯 Mode: {args.mode}")
-    
-    # Determine which symbols to trade
-    symbols = []
+    # Determine symbols to trade
     if args.symbol.lower() == 'all':
         symbols = mm_config.symbols
-        print(f"💰 Symbols: {', '.join(symbols)} (all configured symbols)")
     else:
-        if args.symbol in mm_config.symbols:
-            symbols = [args.symbol]
-            print(f"💰 Symbol: {args.symbol}")
-        else:
-            print(f"⚠️  Symbol {args.symbol} not in configured symbols, using {mm_config.default_symbol}")
-            symbols = [mm_config.default_symbol]
-            print(f"💰 Symbol: {mm_config.default_symbol}")
+        symbols = [args.symbol]
     
+    print(f"🎯 Mode: {args.mode}")
+    print(f"🔬 Version: {args.version}")
+    print(f"📈 Symbols: {', '.join(symbols)}")
     print()
     
-    # Si on n'est pas déjà en mode calibration, on exécute une calibration rapide au démarrage
+    # Auto-calibration before other modes (except calibration itself)
+    verbose_calibration = args.log_level in ['DEBUG', 'INFO']
     if args.mode != 'calibration':
-        print("\n🛠  Auto-calibration avant lancement du mode", args.mode)
-        # Calibrer pour tous les symboles configurés afin que les autres soient prêts
-        run_calibration_mode(mm_config.symbols)
+        print(f"\n🛠  Auto-calibration avant lancement du mode {args.mode}")
+        run_calibration_mode(mm_config.symbols, verbose=verbose_calibration)
 
-    if args.mode == 'paper-trading':
-        asyncio.run(run_paper_trading(symbols, duration_hours=args.duration))
-    elif args.mode == 'backtest':
-        run_backtest_mode()
-    elif args.mode == 'calibration':
-        run_calibration_mode(symbols)
-    elif args.mode == 'live':
-        asyncio.run(run_live_trading(symbols))
+    try:
+        if args.mode == 'paper-trading':
+            asyncio.run(run_paper_trading(symbols, duration_hours=args.duration, version=args.version))
+        elif args.mode == 'backtest':
+            run_backtest_mode()
+        elif args.mode == 'calibration':
+            run_calibration_mode(symbols, verbose=verbose_calibration)
+        elif args.mode == 'live':
+            asyncio.run(run_live_trading(symbols, version=args.version))
+    except KeyboardInterrupt:
+        print("\n🛑 Program interrupted by user")
+        print("✅ Shutdown complete")
+    except Exception as e:
+        print(f"\n❌ Unexpected error: {e}")
+        import traceback
+        traceback.print_exc()
 
 
 if __name__ == "__main__":

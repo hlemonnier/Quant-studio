@@ -14,8 +14,8 @@ from typing import Tuple, Dict, Optional
 import math
 from datetime import datetime, timedelta
 import logging
-from .config import mm_config
-from .ofi import OFICalculator
+from ..utils.config import mm_config
+from ..core.ofi import OFICalculator
 
 class AvellanedaStoikovQuoter:
     """
