@@ -28,6 +28,7 @@ from .data_capture.local_book import LocalBook
 from .utils.inventory_control import InventoryController
 from .utils.kpi_tracker import KPITracker
 from .data_capture.websocket_manager import TradingEngineWSIntegration
+from .data_capture import TradingEngineDBReplayIntegration, TradingEngineCSVReplayIntegration
 
 
 @dataclass
@@ -94,9 +95,31 @@ class TradingEngine:
         self.total_quotes_sent = 0
         self.total_fills = 0
         
-        # WebSocket integration for real-time data
-        self.ws_integration = TradingEngineWSIntegration(self)
-        # WebSocket integration initialized silently
+        # Data integration (WS/DB/CSV) decided at runtime
+        self.data_source = getattr(mm_config, 'data_source', 'websocket')
+        if self.data_source == 'db' and getattr(mm_config, 'db_uri', ''):
+            self.ws_integration = TradingEngineDBReplayIntegration(
+                self,
+                db_uri=mm_config.db_uri,
+                table=mm_config.db_table,
+                start_ts=mm_config.db_start_ts,
+                end_ts=mm_config.db_end_ts,
+                speed=mm_config.replay_speed,
+            )
+            self.logger.info("🔌 Using DB replay as market data source")
+        elif self.data_source == 'csv' and getattr(mm_config, 'csv_path', ''):
+            self.ws_integration = TradingEngineCSVReplayIntegration(
+                self,
+                csv_path=mm_config.csv_path,
+                start_ts=mm_config.db_start_ts,
+                end_ts=mm_config.db_end_ts,
+                speed=mm_config.replay_speed,
+            )
+            self.logger.info("🔌 Using CSV replay as market data source")
+        else:
+            # Default to WebSocket
+            self.ws_integration = TradingEngineWSIntegration(self)
+            self.logger.info("🔌 Using WebSocket as market data source")
         self.session_start = time.time()
         
         # Control flag for trading loop

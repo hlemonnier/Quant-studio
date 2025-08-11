@@ -180,24 +180,70 @@ async def run_paper_trading(symbols: List[str], duration_hours: Optional[int] = 
         print("✅ Shutdown complete")
 
 
+async def run_backtest_streaming(symbols):
+    """Backtest streaming: utilise le moteur temps réel mais alimente par DB/CSV selon mm_config."""
+    print("🧪 Starting Streaming Backtest (DB/CSV Replay)")
+    print("=" * 60)
+
+    if mm_config.data_source not in ['db', 'csv']:
+        print("ℹ️  MM_DATA_SOURCE n'est pas 'db' ou 'csv' → fallback vers backtest simple")
+        return None
+
+    engines = []
+    tasks = []
+    try:
+        for symbol in symbols:
+            engine = TradingEngine(symbol, version=mm_config.strategy_version)
+            engines.append(engine)
+            tasks.append(asyncio.create_task(engine.run_trading_loop()))
+
+        duration_s = getattr(mm_config, 'backtest_duration_seconds', 60)
+        print(f"⏱️  Running streaming backtest for {duration_s}s using {mm_config.data_source.upper()} replay…")
+        try:
+            await asyncio.wait_for(asyncio.gather(*tasks), timeout=duration_s)
+        except asyncio.TimeoutError:
+            print("⏱️  Streaming backtest duration reached → stopping engines…")
+        except Exception as e:
+            print(f"❌ Error during streaming backtest: {e}")
+    finally:
+        for task in tasks:
+            if not task.done():
+                task.cancel()
+        for engine in engines:
+            try:
+                await engine.stop()
+            except Exception:
+                pass
+    return True
+
+
 def run_backtest_mode():
-    """Run backtesting mode"""
+    """Run backtesting mode.
+    - Si MM_DATA_SOURCE in {db,csv} → exécute un backtest streaming (replay)
+    - Sinon → backtest simple synthétique existant
+    """
     print("🧪 Starting V1 Backtesting & Validation")
     print("=" * 60)
-    
+
+    if mm_config.data_source in ['db', 'csv']:
+        try:
+            asyncio.run(run_backtest_streaming([mm_config.default_symbol]))
+        except Exception as e:
+            print(f"❌ Streaming backtest failed: {e}")
+            return
+        print("✅ Streaming backtest completed")
+        return
+
     try:
         results = run_simple_backtest()
-        
         print("\n🎯 Backtesting Results:")
         print(f"  Total PnL: ${results['total_pnl']:.2f}")
         print(f"  Final Inventory: {results['final_inventory']:.4f}")
         print(f"  Validation: {'✅ PASS' if results['validation']['overall_pass'] else '❌ FAIL'}")
-        
         if results['validation']['overall_pass']:
             print("🎉 V1 system ready for paper trading!")
         else:
             print("⚠️  Some performance targets not met - review configuration")
-        
     except Exception as e:
         print(f"❌ Backtesting failed: {e}")
 

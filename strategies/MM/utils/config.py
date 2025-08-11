@@ -118,6 +118,53 @@ class MMConfig:
         self.backtest_commission = 0.001  # Commission 0.1%
 
         # --------------------------------------------------------------
+        # Source de données (WebSocket vs DB vs CSV) pour backtest/replay
+        # --------------------------------------------------------------
+        # Contrôlé via variables d'environnement (voir .env.sample)
+        self.data_source = os.getenv('MM_DATA_SOURCE', 'websocket').lower()
+
+        # Paramètres DB Replay (schéma top-of-book par défaut)
+        self.db_uri = os.getenv('MM_DB_URI', '')
+        self.db_table = os.getenv('MM_DB_TABLE', 'depth_messages')
+        # Format des données en DB: 'json' (payload WS brut) ou 'top_of_book'
+        self.db_format = os.getenv('MM_DB_FORMAT', 'top_of_book').lower()
+        # Colonnes DB pour le format top_of_book
+        self.db_symbol_col = os.getenv('MM_DB_SYMBOL_COL', 'symbol')
+        self.db_time_col = os.getenv('MM_DB_TIME_COL', 'event_time')
+        self.db_bid_col = os.getenv('MM_DB_BID_COL', 'best_bid')
+        self.db_ask_col = os.getenv('MM_DB_ASK_COL', 'best_ask')
+        # Colonnes quantités (optionnelles)
+        self.db_bid_qty_col = os.getenv('MM_DB_BID_QTY_COL', '')
+        self.db_ask_qty_col = os.getenv('MM_DB_ASK_QTY_COL', '')
+        self.db_qty_col = os.getenv('MM_DB_QTY_COL', '')  # fallback si une seule col
+        # Filtres optionnels
+        self.db_feed_col = os.getenv('MM_DB_FEED_COL', '')
+        self.db_feed_value = os.getenv('MM_DB_FEED', '')
+        self.db_exchange_col = os.getenv('MM_DB_EXCHANGE_COL', '')
+        self.db_exchange_value = os.getenv('MM_DB_EXCHANGE', '')
+        # Fenêtre temporelle (epoch ms)
+        self.db_start_ts = self._get_int_env('MM_DB_START_TS_MS')
+        self.db_end_ts = self._get_int_env('MM_DB_END_TS_MS')
+        # Facteur d'accélération du replay (1.0 = temps réel)
+        self.replay_speed = float(os.getenv('MM_REPLAY_SPEED', '1.0'))
+
+        # Paramètres CSV Replay (schéma top-of-book)
+        self.csv_path = os.getenv('MM_CSV_PATH', '')
+        self.csv_time_col = os.getenv('MM_CSV_TIME_COL', 'timestamp')
+        self.csv_symbol_col = os.getenv('MM_CSV_SYMBOL_COL', 'symbol')
+        self.csv_bid_col = os.getenv('MM_CSV_BID_COL', 'best_bid')
+        self.csv_ask_col = os.getenv('MM_CSV_ASK_COL', 'best_ask')
+        self.csv_bid_qty_col = os.getenv('MM_CSV_BID_QTY_COL', '')
+        self.csv_ask_qty_col = os.getenv('MM_CSV_ASK_QTY_COL', '')
+        self.csv_qty_col = os.getenv('MM_CSV_QTY_COL', '')
+        self.csv_feed_col = os.getenv('MM_CSV_FEED_COL', '')
+        self.csv_feed_value = os.getenv('MM_CSV_FEED', '')
+        self.csv_exchange_col = os.getenv('MM_CSV_EXCHANGE_COL', '')
+        self.csv_exchange_value = os.getenv('MM_CSV_EXCHANGE', '')
+        # Durée du backtest (secondes) quand on utilise le moteur temps réel en replay
+        self.backtest_duration_seconds = self._get_int_env('MM_BACKTEST_DURATION_SECONDS') or 60
+
+        # --------------------------------------------------------------
         # Chargement éventuel des paramètres calibrés par symbole
         # --------------------------------------------------------------
         self.symbol_params: Dict[str, Dict[str, Any]] = {}
@@ -198,6 +245,23 @@ class MMConfig:
         print(f"Max volatility allowed: {self.max_volatility_threshold:.2%}")
         print(f"OFI β: {self.beta_ofi} | Window: {self.ofi_window_seconds}s | Clamp: ±{self.ofi_clamp_std}σ")
         print("=" * 40)
+
+        # Affichage source de données
+        print(f"Data source: {self.data_source}")
+        if self.data_source == 'db':
+            print(f"  DB: {self.db_uri} | table: {self.db_table} | format: {self.db_format}")
+        elif self.data_source == 'csv':
+            print(f"  CSV: {self.csv_path}")
+
+    # -------------------------------
+    # Helpers internes
+    # -------------------------------
+    def _get_int_env(self, key: str):
+        val = os.getenv(key, '')
+        try:
+            return int(val) if val else None
+        except Exception:
+            return None
 
 # Instance globale de configuration
 mm_config = MMConfig()

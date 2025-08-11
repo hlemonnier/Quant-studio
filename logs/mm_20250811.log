@@ -1,0 +1,72 @@
+2025-08-11 11:45:02,434 - ParamCalibrator-BTCUSDT - INFO - 🚀 Starting full parameter calibration for BTCUSDT
+2025-08-11 11:45:02,434 - ParamCalibrator-BTCUSDT - INFO - 🔧 Calibrating market impact parameter k...
+2025-08-11 11:45:02,438 - ParamCalibrator-BTCUSDT - INFO - ✅ k calibrated: 0.382 (R²=0.812)
+2025-08-11 11:45:02,438 - ParamCalibrator-BTCUSDT - INFO - 🔧 Calibrating risk aversion parameter γ...
+2025-08-11 11:45:02,439 - ParamCalibrator-BTCUSDT - INFO - ✅ γ calibrated: 0.00001
+2025-08-11 11:45:02,439 - ParamCalibrator-BTCUSDT - INFO -    Best Sharpe: 1571.803
+2025-08-11 11:45:02,440 - ParamCalibrator-BTCUSDT - INFO -    RMS Inventory: 0.1144
+2025-08-11 11:45:02,440 - ParamCalibrator-BTCUSDT - INFO - 🔧 Calibrating time horizon T...
+2025-08-11 11:45:02,440 - ParamCalibrator-BTCUSDT - INFO - ✅ T calibrated: 0.000694 (60s)
+2025-08-11 11:45:02,440 - ParamCalibrator-BTCUSDT - INFO - Applied k = 0.38180495881379267
+2025-08-11 11:45:02,440 - ParamCalibrator-BTCUSDT - INFO - Applied gamma = 1e-05
+2025-08-11 11:45:02,440 - ParamCalibrator-BTCUSDT - INFO - Applied T = 0.0006944444444444445
+2025-08-11 11:45:02,440 - ParamCalibrator-BTCUSDT - INFO - 📁 Calibrated parameters saved to /home/hlemonnier/Bureau/Coding/Quant-studio/strategies/parameters/calibrated_mm.json
+2025-08-11 11:45:02,440 - ParamCalibrator-BTCUSDT - INFO - ✅ Full calibration completed
+2025-08-11 11:45:02,441 - ParamCalibrator-ETHUSDT - INFO - 🚀 Starting full parameter calibration for ETHUSDT
+2025-08-11 11:45:02,441 - ParamCalibrator-ETHUSDT - INFO - 🔧 Calibrating market impact parameter k...
+2025-08-11 11:45:02,442 - ParamCalibrator-ETHUSDT - INFO - ✅ k calibrated: 0.412 (R²=0.872)
+2025-08-11 11:45:02,442 - ParamCalibrator-ETHUSDT - INFO - 🔧 Calibrating risk aversion parameter γ...
+2025-08-11 11:45:02,443 - ParamCalibrator-ETHUSDT - INFO - ✅ γ calibrated: 0.00001
+2025-08-11 11:45:02,444 - ParamCalibrator-ETHUSDT - INFO -    Best Sharpe: 1055.924
+2025-08-11 11:45:02,444 - ParamCalibrator-ETHUSDT - INFO -    RMS Inventory: 0.1217
+2025-08-11 11:45:02,444 - ParamCalibrator-ETHUSDT - INFO - 🔧 Calibrating time horizon T...
+2025-08-11 11:45:02,444 - ParamCalibrator-ETHUSDT - INFO - ✅ T calibrated: 0.000694 (60s)
+2025-08-11 11:45:02,444 - ParamCalibrator-ETHUSDT - INFO - Applied k = 0.4118601273271881
+2025-08-11 11:45:02,444 - ParamCalibrator-ETHUSDT - INFO - Applied gamma = 1e-05
+2025-08-11 11:45:02,444 - ParamCalibrator-ETHUSDT - INFO - Applied T = 0.0006944444444444445
+2025-08-11 11:45:02,444 - ParamCalibrator-ETHUSDT - INFO - 📁 Calibrated parameters saved to /home/hlemonnier/Bureau/Coding/Quant-studio/strategies/parameters/calibrated_mm.json
+2025-08-11 11:45:02,444 - ParamCalibrator-ETHUSDT - INFO - ✅ Full calibration completed
+2025-08-11 11:45:02,445 - TradingEngine-BTCUSDT-V1-α - WARNING - 🚀 V1-α Trading Engine initialized
+2025-08-11 11:47:58,583 - ParamCalibrator-BTCUSDT - INFO - 🚀 Starting full parameter calibration for BTCUSDT
+2025-08-11 11:47:58,583 - ParamCalibrator-BTCUSDT - INFO - 🔧 Calibrating market impact parameter k...
+2025-08-11 11:47:58,584 - ParamCalibrator-BTCUSDT - INFO - ✅ k calibrated: 0.442 (R²=0.833)
+2025-08-11 11:47:58,585 - ParamCalibrator-BTCUSDT - INFO - 🔧 Calibrating risk aversion parameter γ...
+2025-08-11 11:47:58,586 - ParamCalibrator-BTCUSDT - INFO - ✅ γ calibrated: 0.00001
+2025-08-11 11:47:58,586 - ParamCalibrator-BTCUSDT - INFO -    Best Sharpe: 1290.898
+2025-08-11 11:47:58,586 - ParamCalibrator-BTCUSDT - INFO -    RMS Inventory: 0.1152
+2025-08-11 11:47:58,586 - ParamCalibrator-BTCUSDT - INFO - 🔧 Calibrating time horizon T...
+2025-08-11 11:47:58,586 - ParamCalibrator-BTCUSDT - INFO - ✅ T calibrated: 0.000694 (60s)
+2025-08-11 11:47:58,586 - ParamCalibrator-BTCUSDT - INFO - Applied k = 0.4415917883262917
+2025-08-11 11:47:58,586 - ParamCalibrator-BTCUSDT - INFO - Applied gamma = 1e-05
+2025-08-11 11:47:58,586 - ParamCalibrator-BTCUSDT - INFO - Applied T = 0.0006944444444444445
+2025-08-11 11:47:58,587 - ParamCalibrator-BTCUSDT - INFO - 📁 Calibrated parameters saved to /home/hlemonnier/Bureau/Coding/Quant-studio/strategies/parameters/calibrated_mm.json
+2025-08-11 11:47:58,587 - ParamCalibrator-BTCUSDT - INFO - ✅ Full calibration completed
+2025-08-11 11:47:58,587 - ParamCalibrator-ETHUSDT - INFO - 🚀 Starting full parameter calibration for ETHUSDT
+2025-08-11 11:47:58,588 - ParamCalibrator-ETHUSDT - INFO - 🔧 Calibrating market impact parameter k...
+2025-08-11 11:47:58,589 - ParamCalibrator-ETHUSDT - INFO - ✅ k calibrated: 0.382 (R²=0.808)
+2025-08-11 11:47:58,589 - ParamCalibrator-ETHUSDT - INFO - 🔧 Calibrating risk aversion parameter γ...
+2025-08-11 11:47:58,590 - ParamCalibrator-ETHUSDT - INFO - ✅ γ calibrated: 0.00001
+2025-08-11 11:47:58,590 - ParamCalibrator-ETHUSDT - INFO -    Best Sharpe: 1716.724
+2025-08-11 11:47:58,590 - ParamCalibrator-ETHUSDT - INFO -    RMS Inventory: 0.1898
+2025-08-11 11:47:58,591 - ParamCalibrator-ETHUSDT - INFO - 🔧 Calibrating time horizon T...
+2025-08-11 11:47:58,591 - ParamCalibrator-ETHUSDT - INFO - ✅ T calibrated: 0.000694 (60s)
+2025-08-11 11:47:58,591 - ParamCalibrator-ETHUSDT - INFO - Applied k = 0.3817354492956603
+2025-08-11 11:47:58,591 - ParamCalibrator-ETHUSDT - INFO - Applied gamma = 1e-05
+2025-08-11 11:47:58,591 - ParamCalibrator-ETHUSDT - INFO - Applied T = 0.0006944444444444445
+2025-08-11 11:47:58,591 - ParamCalibrator-ETHUSDT - INFO - 📁 Calibrated parameters saved to /home/hlemonnier/Bureau/Coding/Quant-studio/strategies/parameters/calibrated_mm.json
+2025-08-11 11:47:58,591 - ParamCalibrator-ETHUSDT - INFO - ✅ Full calibration completed
+2025-08-11 11:47:58,591 - TradingEngine-BTCUSDT-V1-α - WARNING - 🚀 V1-α Trading Engine initialized
+2025-08-11 11:47:58,591 - TradingEngine-BTCUSDT-V1-α - INFO - 🔌 Using CSV replay as market data source
+2025-08-11 11:48:00,593 - TradingEngine-BTCUSDT-V1-α - WARNING - ⚠️ No mid price yet, will update when WebSocket data arrives
+2025-08-11 11:48:00,593 - CSVIntegration-BTCUSDT - INFO - 🚀 Starting CSV replay integration for BTCUSDT
+2025-08-11 11:48:00,593 - CSVReplay-BTCUSDT - INFO - 🔄 Starting CSV replay for BTCUSDT from /home/hlemonnier/Bureau/Coding/Quant-studio/strategies/airflow_public_binance_ladder_spot.csv (speed ×1.00)
+2025-08-11 11:48:00,895 - CSVReplay-BTCUSDT - INFO - ✅ CSV replay finished for BTCUSDT
+2025-08-11 11:48:02,503 - TradingEngine-BTCUSDT-V1-α - INFO - 🟢 FILL: BID 0.0031 @ $121358.00 | Inventory: +0.0031
+2025-08-11 11:48:02,804 - TradingEngine-BTCUSDT-V1-α - INFO - 🟢 FILL: BID 0.0084 @ $121358.00 | Inventory: +0.0115
+2025-08-11 11:48:03,408 - TradingEngine-BTCUSDT-V1-α - INFO - 🟢 FILL: BID 0.0032 @ $121358.00 | Inventory: +0.0147
+2025-08-11 11:48:03,592 - TradingEngine-BTCUSDT-V1-α - INFO - Trading loop cancelled
+2025-08-11 11:48:03,592 - CSVIntegration-BTCUSDT - INFO - 🛑 Stopping CSV replay integration for BTCUSDT
+2025-08-11 11:48:03,592 - TradingEngine-BTCUSDT-V1-α - INFO - Trading loop stopped
+2025-08-11 11:48:03,592 - TradingEngine-BTCUSDT-V1-α - INFO - 🛑 Stopping trading engine...
+2025-08-11 11:48:03,592 - CSVIntegration-BTCUSDT - INFO - 🛑 Stopping CSV replay integration for BTCUSDT
+2025-08-11 11:48:04,101 - TradingEngine-BTCUSDT-V1-α - INFO - ✅ Trading engine stopped

@@ -65,8 +65,7 @@ class BinanceDepthStreamCapture:
                         self.logger.error(f"❌ Error processing message: {e}")
                         
         except websockets.exceptions.ConnectionClosed:
-            # WebSocket connection closed
-            pass
+            self.logger.info("🛑 WebSocket connection closed")
         except Exception as e:
             self.logger.error(f"❌ WebSocket error: {e}")
         finally:
@@ -129,12 +128,12 @@ class WSLocalBookIntegration:
     
     async def start_integration(self):
         """Démarre l'intégration WebSocket"""
-        # Starting WebSocket integration
+        self.logger.info(f"🚀 Starting WebSocket integration for {self.symbols}...")
         await self.ws_capture.start_capture()
     
     def stop_integration(self):
         """Arrête l'intégration WebSocket"""
-        # Stopping WebSocket integration
+        self.logger.info("🛑 Stopping WebSocket integration...")
         self.ws_capture.stop()
     
     def convert_ws_to_diff_format(self, ws_data: dict) -> dict:
@@ -181,14 +180,14 @@ class TradingEngineWSIntegration:
     
     async def start_integration(self):
         """Démarre l'intégration WebSocket"""
-        # Starting WebSocket integration
+        self.logger.info(f"🚀 Starting WebSocket integration for {self.symbol}...")
         
         # Créer une tâche pour l'intégration WebSocket
         self.ws_task = asyncio.create_task(
             self.integration.start_integration()
         )
         
-        # WebSocket integration active
+        self.logger.info(f"✅ WebSocket integration active for {self.symbol}")
     
     async def stop_integration(self):
         """Arrête l'intégration WebSocket"""
@@ -208,7 +207,7 @@ class TradingEngineWSIntegration:
             except Exception as e:
                 self.logger.warning(f"⚠️ Error during task cleanup: {e}")
         
-        # WebSocket integration stopped
+        self.logger.info(f"🛑 WebSocket integration stopped for {self.symbol}")
     
     def get_integration_stats(self):
         """Retourne les statistiques d'intégration WebSocket"""

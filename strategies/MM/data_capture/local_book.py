@@ -29,7 +29,6 @@ class LocalBook:
         self.last_sync_time = None
         
         # Setup logging
-        self.logger = logging.getLogger(f"LocalBook-{symbol}")
         
     def initialize_empty_book(self):
         """Initialise un book vide - sera rempli par les WebSocket updates"""
@@ -37,21 +36,12 @@ class LocalBook:
         self.asks = {}
         self.is_synchronized = True  # Toujours synchronisé en mode WebSocket pur
         self.last_sync_time = datetime.now()
-        # LocalBook initialized silently
         return True
 
     
     def apply_diff(self, diff_data: dict) -> bool:
         """Applique un diff WebSocket au book local - Version simplifiée"""
         try:
-            # Log des premières applications pour diagnostic
-            if self.update_count < 10:
-                self.logger.info(f"🔄 Applying WebSocket update #{self.update_count+1} for {self.symbol}")
-                self.logger.info(f"📊 Diff data keys: {list(diff_data.keys())}")
-                if 'b' in diff_data:
-                    self.logger.info(f"📈 Bids updates: {len(diff_data['b'])} entries")
-                if 'a' in diff_data:
-                    self.logger.info(f"📉 Asks updates: {len(diff_data['a'])} entries")
             
             # Appliquer les modifications bids
             for price_str, qty_str in diff_data.get('b', []):
@@ -87,12 +77,10 @@ class LocalBook:
             if self.update_count <= 10:
                 best_bid = max(self.bids.keys()) if self.bids else 0
                 best_ask = min(self.asks.keys()) if self.asks else 0
-                self.logger.info(f"✅ Update #{self.update_count} applied: Best bid={best_bid:.2f}, Best ask={best_ask:.2f}")
             
             return True
             
         except Exception as e:
-            self.logger.error(f"❌ Erreur application diff: {e}")
             self.is_synchronized = False
             return False
     
@@ -202,17 +190,6 @@ class LocalBook:
         bid_depth = self.get_depth_l1_l5_bid()
         ask_depth = self.get_depth_l1_l5_ask()
         
-        # Debug: Log occasionally to check if values change
-        import time
-        if not hasattr(self, '_last_depth_log') or time.time() - self._last_depth_log > 10:
-            self._last_depth_log = time.time()
-            # Show top 3 levels for debugging
-            top_bids = sorted(self.bids.items(), key=lambda x: x[0], reverse=True)[:3]
-            top_asks = sorted(self.asks.items(), key=lambda x: x[0])[:3]
-            print(f"DEBUG LocalBook {self.symbol}: bid_depth={bid_depth:.4f}, ask_depth={ask_depth:.4f}")
-            print(f"  Top bids: {top_bids}")
-            print(f"  Top asks: {top_asks}")
-        
         return bid_depth, ask_depth
     
     def calculate_checksum(self) -> str:
@@ -257,34 +234,6 @@ class LocalBook:
         
         return stats
     
-    def print_book_summary(self, levels: int = 10):
-        """Affiche un résumé du book"""
-        if not self.is_synchronized:
-            print(f"❌ {self.symbol} - Book non synchronisé")
-            return
-        
-        bid_array, ask_array = self.get_book_arrays(levels)
-        stats = self.get_book_stats()
-        
-        print(f"\n📖 Order Book {self.symbol}")
-        print("=" * 50)
-        print(f"Updates: {self.update_count} | Sync: {self.is_synchronized}")
-        print(f"Mid: ${stats['mid_price']:.2f} | Spread: {stats['spread_bps']:.1f}bps")
-        print(f"Imbalance 5: {stats['imbalance_5']:.3f}")
-        print()
-        
-        print("ASKS (ascending)")
-        for price, qty in reversed(ask_array):
-            print(f"  ${price:.2f} : {qty:.6f}")
-        
-        print(f"  --- SPREAD: ${stats['spread']:.4f} ---")
-        
-        print("BIDS (descending)")
-        for price, qty in bid_array:
-            print(f"  ${price:.2f} : {qty:.6f}")
-        
-        print("=" * 50)
-    
     def resync_if_needed(self) -> bool:
         """Re-synchronise le book si nécessaire (WebSocket mode - toujours sync)"""
         return True  # En mode WebSocket pur, toujours synchronisé
@@ -298,12 +247,7 @@ class LocalBook:
         
         # Appliquer la mise à jour
         success = self.apply_diff(diff_data)
-        
-        if success:
-            # Log périodique des mises à jour
-            if self.update_count % 100 == 0:
-                self.logger.debug(f"✅ {self.symbol}: {self.update_count} WebSocket updates applied")
-        
+                
         return success
 
 class MultiBookManager:
@@ -311,7 +255,6 @@ class MultiBookManager:
     
     def __init__(self, symbols: List[str]):
         self.books = {symbol: LocalBook(symbol) for symbol in symbols}
-        self.logger = logging.getLogger("MultiBookManager")
     
     def sync_all_books(self) -> Dict[str, bool]:
         """Synchronise tous les books (WebSocket mode - toujours sync)"""
